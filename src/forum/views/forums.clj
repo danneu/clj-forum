@@ -41,10 +41,11 @@
        [:td (count (:topic/posts t)) " posts"]
        [:td (pretty-date (:topic/created t))]])]
 
+   ;; New topic form
    [:h3 "New Topic"]
    (form-to
        {:role "form"}
-       [:post (str "/forums/" (:db/id forum) "/topics")]
+       [:post (str (url-for :forum forum) "/topics")]
     [:div.form-group
      (text-field {:class "form-control"
                   :placeholder "Title"}
