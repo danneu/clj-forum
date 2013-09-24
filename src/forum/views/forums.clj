@@ -36,7 +36,7 @@
       [:tr
        [:td
         (link-to (url-for topic)
-                 (:topic/title t)) [:br]
+                 (:topic/title topic)) [:br]
         "by " (link-to "/" "Username")]
        [:td (count (:topic/posts topic)) " posts"]
        [:td (pretty-date (:topic/created topic))]])]
@@ -46,12 +46,12 @@
    (form-to
        {:role "form"}
        [:post (str (url-for forum) "/topics")]
-    [:div.form-group
-     (text-field {:class "form-control"
-                  :placeholder "Title"}
-                 "topic[title]")]
-    [:div.form-group
-     (text-area {:class "form-control"
-                 :placeholder "Post"}
-                "topic[post][text]")]
-    (submit-button {:class "btn btn-default"} "Submit"))))
+     [:div.form-group
+      (text-field {:class "form-control"
+                   :placeholder "Title"}
+                  "topic[title]")]
+     [:div.form-group
+      (text-area {:class "form-control"
+                  :placeholder "Post"}
+                 "topic[post][text]")]
+     (submit-button {:class "btn btn-default"} "Submit"))))

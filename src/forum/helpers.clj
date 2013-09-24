@@ -21,7 +21,7 @@
     (cond
      (:forum/uid e) (str "/forums/" (:forum/uid e))
      (:topic/uid e) (str (url-for (parent-forum e))
-                         "/topics/" (:topic/uid)))))
+                         "/topics/" (:topic/uid e)))))
 
 (defn latest-topic
   "Given a forum entity, returns latest topic
