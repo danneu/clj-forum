@@ -6,8 +6,7 @@
             [forum.db :as db]
             [forum.controllers.forums]
             [forum.controllers.posts]
-            [forum.controllers.topics])
-  (:gen-class))
+            [forum.controllers.topics]))
 
 ;; - The Router should do preliminary checking on params so that
 ;;   Controllers can expect to coerce, ex. (Long. "123"),

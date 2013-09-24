@@ -11,7 +11,5 @@
    [expectations "1.4.55"]]
   :plugins [[lein-ring "0.8.5"]]
   :ring {:handler forum.handler/app}
-  :main forum.handler
-  :aot [forum.handler]
   :profiles
   {:dev {:dependencies [[ring-mock "0.1.5"]]}})
