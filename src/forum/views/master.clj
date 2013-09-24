@@ -1,11 +1,5 @@
 (ns forum.views.master
-  (:use [hiccup core element page util])
-  (:import [org.ocpsoft.prettytime PrettyTime]))
-
-(defn pretty-date
-  "Turn Date into string of 'about 10 minutes ago'."
-  [date]
-  (.format (PrettyTime.) date))
+  (:use [hiccup core element page util]))
 
 (defn render-crumbs [crumbs]
   (when crumbs
