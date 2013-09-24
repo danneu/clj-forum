@@ -22,3 +22,31 @@
 - `git clone git@github.com:danneu/clj-forum.git`
 - `cd clj-forum`
 - `lein ring server`
+
+## Implementation
+
+I'm figuring things out as I go and leaning on Rails familiarities.
+
+My goal, as I progress, is to figure out what abstractions, organization patterns, and strategies do and do not work.
+
+### UID vs. :db/id
+
+I decided to add a `:<entity-name>/uid` attribute to every entity.
+
+Much like the autoincrementing serial PrimaryKey in the relational databases I'm used to working with, I implemented a transaction function that increments the UID of any forum, post, topic, any time one is created.
+
+UIDs are only incremented in the scope of like-entities. If you create one forum, one topic, and one post, then they all have a UID of 1 (`:forum/uid`, `:topic/uid`, `:post/uid`).
+
+#### Benefits of UID:
+
+- URLs have gone from:
+
+    http://localhost:3000/forums/17592186045421/topics/17592186045427
+    
+to:
+
+    http://localhost:3000/forums/1/topics/1
+
+- :db/id is internal to Datomic, so it's regenerated any time, for example, the data is restored from a database.
+
+- Can be used to sort entities.
