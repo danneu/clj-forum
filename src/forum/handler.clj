@@ -1,11 +1,13 @@
 (ns forum.handler
   (:use [compojure.core])
   (:require [compojure.handler :as handler]
+            [ring.adapter.jetty :refer [run-jetty]]
             [compojure.route :as route]
             [forum.db :as db]
             [forum.controllers.forums]
             [forum.controllers.posts]
-            [forum.controllers.topics]))
+            [forum.controllers.topics])
+  (:gen-class))
 
 ;; - The Router should do preliminary checking on params so that
 ;;   Controllers can expect to coerce, ex. (Long. "123"),
@@ -35,3 +37,12 @@
 
 (def app
   (handler/site app-routes))
+
+;; Server
+
+(defn start-server [port]
+  (run-jetty app {:port port}))
+
+(defn -main [& args]
+  (let [port (Integer. (or (first args) "5010"))]
+    (start-server port)))
