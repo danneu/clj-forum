@@ -10,6 +10,7 @@
     (when-let [topic (forum.db/get-topic (Long. topicid))]
       (let [posts (:topic/posts topic)]
         ;; TODO: Put the sort-by in forum.db layer or something.
+        ;; TODO: Create a url generator from resources.
         (layout
          {:crumbs [(link-to (url "/forums/" (:db/id forum))
                             (:forum/title forum))]}

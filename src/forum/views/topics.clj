@@ -13,10 +13,21 @@
 (defn show [forum topic posts]
   (html
    [:h1 (:topic/title topic)]
-   [:ul
+   [:ul.list-group
     (for [p posts]
-      [:li (:post/position p) ". " (:post/text p)
-       " - " (pretty-date (:post/createdAt p))])
-    (form-to [:post (gen-url forum topic "posts")]
-      (text-area "post[text]")
-      (submit-button "Post Reply"))]))
+      [:li.list-group-item
+        [:div.row
+         [:div.col-lg-2
+          (link-to "/" "Username") [:br]
+          (pretty-date (:post/createdAt p))]
+         [:div.col-lg-10 (:post/text p)]]])]
+
+   [:h3 "New Post"]
+   (form-to
+       {:role "form"}
+       [:post (gen-url forum topic "posts")]
+    [:div.form-group
+     (text-area {:class "form-control"
+                 :placeholder "Text"}
+                "post[text]")]
+    (submit-button {:class "btn btn-default"} "Submit"))))

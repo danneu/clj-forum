@@ -22,6 +22,26 @@
      (layout {} view))
   ([opts view]
      (html5
-      [:title "Forum"]
-      (render-crumbs (:crumbs opts))
-      view)))
+      [:head
+       [:title "Forum"]
+       (include-css "/bootstrap/css/bootstrap.css")
+       (include-css "/css/bootstrap-override.css")]
+      [:body
+       [:div.container
+        [:div.header
+         [:ul.nav.nav-pills.pull-right
+          [:li (link-to "/" "Home")]
+          [:li (link-to "/" "About")]
+          [:li (link-to "/" "Contact")]]
+         [:h3 (link-to "/" "Forum")]]
+
+        view 
+
+       [:div.footer
+        [:p.pull-right
+         "Source code at "
+         (link-to "http://github.com/danneu/clj-forum" "github")]]]]
+
+
+       ;(render-crumbs (:crumbs opts))
+      )))
