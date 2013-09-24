@@ -1,0 +1,14 @@
+[
+ {:db/id #db/id[:db.part/user]
+  :db/ident :bumpPosition
+  :db/doc "Atomically adds to the end of a list of sorted cardinality/many lists"
+  :db/fn #db/fn {:lang "clojure"
+                 ;; [forum-eid :forum/topics topic-eid :topic/position]
+                 ;; [topic-eid :topic/posts  post-eid  :post/position]
+                 :requires [[datomic.api]]
+                 :params [db scope-id scope-attr new-id pos-attr]
+                 :code (let [children (scope-attr (datomic.api/entity db scope-id))
+                             highest-pos (reduce max 0 (map pos-attr children))]
+                         [[:db/add new-id pos-attr (inc highest-pos)]])}}
+
+ ]

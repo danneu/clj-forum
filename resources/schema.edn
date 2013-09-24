@@ -1,0 +1,49 @@
+[
+ ;; Forum
+ ;; :forum/title one string
+ {:db/id #db/id[:db.part/db]
+  :db/ident :forum/title
+  :db/valueType :db.type/string        
+  :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
+ ;; :forum/topics many ref
+ {:db/id #db/id[:db.part/db]
+  :db/ident :forum/topics
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/many
+  :db.install/_attribute :db.part/db}
+ ;; Topic
+ ;; :topic/title one string
+ {:db/id #db/id[:db.part/db]
+  :db/ident :topic/title
+  :db/valueType :db.type/string        
+  :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
+ ;; :topic/position one long
+ {:db/id #db/id[:db.part/db]
+  :db/ident :topic/position
+  :db/valueType :db.type/long
+  :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
+ ;; :topic/posts many ref
+ {:db/id #db/id[:db.part/db]
+  :db/ident :topic/posts
+  :db/valueType :db.type/ref        
+  :db/cardinality :db.cardinality/many
+  :db.install/_attribute :db.part/db}
+
+ ;; Post
+ ;; :post/text one string
+ {:db/id #db/id[:db.part/db]
+  :db/ident :post/text
+  :db/valueType :db.type/string        
+  :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
+ ;; :post/position one long
+ {:db/id #db/id[:db.part/db]   
+  :db/ident :post/position
+  :db/valueType :db.type/long
+  :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
+
+ ]
