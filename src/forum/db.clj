@@ -2,7 +2,9 @@
   (:require [datomic.api :as d]
             [clojure.java.io :as io]
             [clojure.pprint :refer [pprint]])
-  (:import [datomic Util]))
+  (:import [datomic Util]
+           [java.util Date]
+           [org.ocpsoft.prettytime PrettyTime]))
 
 ;; Utils ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -22,7 +24,7 @@ resource that can be opened by io/reader."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def uri "datomic:mem://forum")
+(def uri "datomic:free://localhost:4334/forum")
 
 (defn create-db []
   (d/delete-database uri)
@@ -32,7 +34,8 @@ resource that can be opened by io/reader."
     (transact-all conn "resources/data-functions.edn")
     conn))
 
-(def conn (create-db))
+;; If DB is migrated just return conn, else seed it.
+(def conn (d/connect uri))
 
 (defn tempid []
   (d/tempid :db.part/user))
@@ -79,7 +82,9 @@ resource that can be opened by io/reader."
   [forumid title]
   (let [topicid (tempid)]
     (let [tx-result @(d/transact conn
-                                 [{:db/id topicid :topic/title title}
+                                 [{:db/id topicid
+                                   :topic/title title
+                                   :topic/createdAt (Date.)}
                                   [:addTopicPosition forumid topicid]
                                   {:db/id forumid :forum/topics topicid}])]
       ;; Get eid of the topic created
@@ -100,7 +105,9 @@ resource that can be opened by io/reader."
   [topicid text]
   (let [postid (tempid)]
     (let [tx-result @(d/transact conn
-                                 [{:db/id postid :post/text text}
+                                 [{:db/id postid
+                                   :post/text text
+                                   :post/createdAt (Date.)}
                                   [:addPostPosition topicid postid]
                                   {:db/id topicid :topic/posts postid}])]
       ;; Get eid of the post created
@@ -117,28 +124,48 @@ resource that can be opened by io/reader."
    (take (+ 3 (rand-int 5))
          (repeatedly #(rand-nth "abcdefghijklmnopqrstuvwxyz")))))
 
-(defn generate-post-text
-  "Generates a string of words between 7 and 27 words long."
+(defn generate-sentence
   []
-  (as-> (+ 7 (rand-int 21)) _
+  (as-> (+ 2 (rand-int 5)) _
         (take _ (repeatedly generate-word))
         (clojure.string/join " " _)
         (clojure.string/capitalize _)
         (str _ ".")))
 
-;; FIXME: Generalize seed-db so I can scale it.
+(defn seed-db [conn topics-per-forum posts-per-topic]
+  (let [forums (map create-forum ["Forum A" "Forum B" "Forum C"])
+        topics (flatten
+                (repeatedly
+                 topics-per-forum
+                 #(for [forum forums]
+                    (create-topic forum
+                                  (generate-sentence)))))]
+    (doseq [topic topics]
+      (dotimes [_ posts-per-topic]
+        (create-post
+         topic
+         (clojure.string/join
+          " "
+          (take 3 (repeatedly generate-sentence))))))))
 
-(defn seed-db [conn]
-  (let [forum1 (create-forum "Forum A")
-        forum2 (create-forum "Forum B")
-        forum3 (create-forum "Forum C")]
-    (let [forum1-topics (map (partial create-topic forum1)
-                             ["Topic 1" "Topic 2" "Topic 3"])
-          forum2-topics (map (partial create-topic forum2)
-                             ["Topic 4" "Topic 5" "Topic 6"])
-          forum3-topics (map (partial create-topic forum3)
-                             ["Topic 7" "Topic 8" "Topic 9"])]
-      (doseq [t (flatten [forum1-topics forum2-topics forum3-topics])]
-        (dotimes [_ 3] (create-post t (generate-post-text)))))))
+(defn get-all-topics []
+  (let [res (d/q '[:find ?t
+                   :where [?t :topic/title]]
+                 (d/db conn))]
+    (map (comp entity first) res)))
 
-(seed-db conn)
+(defn get-all-posts []
+  (let [res (d/q '[:find ?t
+                   :where [?t :post/text]]
+                 (d/db conn))]
+    (map (comp entity first) res)))
+
+;; Seed check ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(when (empty? (d/q '[:find ?e
+                   :where [?e :db/ident :topic/createdAt]]
+                 (d/db conn)))
+  (let [conn (create-db)]
+    (seed-db conn)))
+
+(count (get-all-posts))

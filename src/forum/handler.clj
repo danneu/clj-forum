@@ -4,6 +4,7 @@
             [compojure.route :as route]
             [forum.db :as db]
             [forum.controllers.forums]
+            [forum.controllers.posts]
             [forum.controllers.topics]))
 
 ;; - The Router should do preliminary checking on params so that
@@ -17,13 +18,17 @@
 (defroutes app-routes
   (GET "/" []
     (forum.controllers.forums/index))
-  ;; /forums/:forumid
-  ;; /forums/:forumid/topics/:topicid
   (context ["/forums/:forumid", :forumid #"[0-9]+"] [forumid]
+    ;; /forums/:forumid
     (GET "/" []
       (forum.controllers.forums/show forumid))
-    (GET ["/topics/:topicid", :topicid #"[0-9]+"] [topicid]
-      (forum.controllers.topics/show forumid topicid)))
+    (context ["/topics/:topicid", :topicid #"[0-9]+"] [topicid]
+      ;; /forums/:forumid/topics/:topicid
+      (GET "/" []
+        (forum.controllers.topics/show forumid topicid))
+      ;; /forums/:forumid/topics/:topicid/posts
+      (POST "/posts" [post]
+        (forum.controllers.posts/create forumid topicid post))))
   (route/resources "/")
   (route/not-found "Not Found"))
 

@@ -31,6 +31,12 @@
   :db/valueType :db.type/ref        
   :db/cardinality :db.cardinality/many
   :db.install/_attribute :db.part/db}
+ ;; :topic/createdAt one instant
+ {:db/id #db/id[:db.part/db]
+  :db/ident :topic/createdAt
+  :db/valueType :db.type/instant
+  :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
 
  ;; Post
  ;; :post/text one string
@@ -43,6 +49,12 @@
  {:db/id #db/id[:db.part/db]   
   :db/ident :post/position
   :db/valueType :db.type/long
+  :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
+ ;; :post/createdAt one instant
+ {:db/id #db/id[:db.part/db]   
+  :db/ident :post/createdAt
+  :db/valueType :db.type/instant
   :db/cardinality :db.cardinality/one
   :db.install/_attribute :db.part/db}
 
