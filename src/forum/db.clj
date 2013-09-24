@@ -71,10 +71,11 @@ resource that can be opened by io/reader."
 
 (defn create-forum
   "Returns entity ID of created forum."
-  [title]
+  [title desc]
   (let [tx-result @(d/transact conn
                                [{:db/id (tempid)
-                                 :forum/title title}])]
+                                 :forum/title title
+                                 :forum/desc desc}])]
     (:e (last (:tx-data tx-result)))))
 
 (defn create-topic
@@ -144,12 +145,20 @@ resource that can be opened by io/reader."
         (str _ ".")))
 
 (defn seed-db [conn topics-per-forum posts-per-topic]
-  (let [forums (map create-forum ["Forum A" "Forum B" "Forum C"])
+  (let [forums (for [[title desc]
+                     [["Newbie Introductions"
+                       "Are you new here? Then introduce yourself!"]
+                      ["General Discussion"
+                       "Talk about whatever and just kick it."]
+                      ["Suggestions/Support"
+                       "Need help or have an idea to improve the place? Come share."]]]
+                 (create-forum title desc))
         topics (flatten
                 (repeatedly
                  topics-per-forum
                  #(for [forum forums]
                     (create-topic forum
+                                  (generate-sentence)
                                   (generate-sentence)))))]
     (doseq [topic topics]
       (dotimes [_ posts-per-topic]
@@ -173,10 +182,16 @@ resource that can be opened by io/reader."
 
 ;; Seed check ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (empty? (d/q '[:find ?e
-                   :where [?e :db/ident :topic/createdAt]]
-                 (d/db conn)))
-  (let [conn (create-db)]
-    (seed-db conn)))
+(let [wipe? false]
+  (when (or (empty? (d/q '[:find ?e
+                           :where [?e :db/ident :topic/createdAt]]
+                         (d/db conn)))
+            wipe?)
+    ;; Can I think of a better solution than redef?
+    (def conn (create-db))
+    (seed-db conn 5 5)))
+
+;; Show total post count on file eval (sanity check)
 
 (count (get-all-posts))
+

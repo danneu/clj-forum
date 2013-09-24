@@ -13,18 +13,25 @@
     [:p.lead "Where thugs get it free and you've gotta be a G."]
     [:p [:a.btn.btn-lg.btn-success {:href "/"} "Sign up"]]]
 
-
-   [:h1 "Forums"]
-   [:table.table
-    (for [f forums]
-      [:tr
-       [:td (link-to (url-for f)
-                     (:forum/title f))]
-       [:td (count (:forum/topics f)) " topics"]])]))
+   [:div.list-group.forum-list
+    (for [forum forums]
+      [:a.list-group-item {:href (url-for forum)}
+       [:div.row
+        [:div.col-lg-8
+         [:h4.list-group-item-heading.forum-title
+          (:forum/title forum)]
+         [:p.list-group-item-text (:forum/desc forum)]]
+        [:div.col-lg-4.forum-meta
+         (str (count (:forum/topics forum)) " topics") [:br]
+         (str (pretty-date (:topic/createdAt (latest-topic forum))))
+         ]
+        ]])
+    ]))
 
 (defn show [forum topics]
   (html
-   [:h1 (:forum/title forum)]
+   [:h2 (:forum/title forum)]
+   
    [:table.table
     (for [t topics]
       [:tr

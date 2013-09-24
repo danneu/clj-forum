@@ -77,3 +77,16 @@ body {
     border-bottom: 0;
   }
 }
+
+/* danneu */
+
+.footer {
+  margin-top: 15px;
+}
+
+.forum-list h4.forum-title {
+  color: #428BCA;
+}
+.forum-list .forum-meta {
+  text-align: center;
+}
