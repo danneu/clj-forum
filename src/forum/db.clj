@@ -35,7 +35,7 @@ resource that can be opened by io/reader."
     conn))
 
 ;; (def conn (d/connect uri))
-(def conn (d/create-db))
+(def conn (create-db))
 
 (defn tempid []
   (d/tempid :db.part/user))
