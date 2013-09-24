@@ -1,5 +1,5 @@
 (ns forum.views.forums
-  (:use [hiccup core element util])
+  (:use [hiccup core form page element util])
   (:require [forum.views.master :refer :all]))
 
 (defn index [forums]
@@ -22,4 +22,12 @@
                 (:topic/title t))
        ;; FIXME: Pulling posts out of topic. I think this is too much knowledge for view.
        " - (" (count (:topic/posts t)) " posts)"
-       " - " (pretty-date (:topic/createdAt t))])]))
+       " - " (pretty-date (:topic/createdAt t))])]
+
+   ;; New topic form
+   (form-to [:post (str "/forums/" (:db/id forum) "/topics")]
+    (label "topic[title]" "Topic Title:")
+    (text-field "topic[title]")
+    (label "topic[post][text]" "Topic Text:")
+    (text-area "topic[post][text]")
+    (submit-button "Post Topic"))))

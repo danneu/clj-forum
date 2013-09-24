@@ -79,14 +79,25 @@ resource that can be opened by io/reader."
 
 (defn create-topic
   "Returns entity ID of created topic."
-  [forumid title]
-  (let [topicid (tempid)]
-    (let [tx-result @(d/transact conn
-                                 [{:db/id topicid
-                                   :topic/title title
-                                   :topic/createdAt (Date.)}
-                                  [:addTopicPosition forumid topicid]
-                                  {:db/id forumid :forum/topics topicid}])]
+  [forumid title text]
+  (let [topicid (tempid)
+        postid (tempid)
+        now (Date.)]
+    (let [tx-result
+          @(d/transact conn
+                       [;; Make topic
+                        {:db/id topicid
+                         :topic/title title
+                         :topic/createdAt now}
+                        [:addTopicPosition forumid topicid]
+                        {:db/id forumid :forum/topics topicid}
+
+                        ;; Make post
+                        {:db/id postid
+                         :post/text text
+                         :post/createdAt now}
+                        [:addPostPosition topicid postid]
+                        {:db/id topicid :topic/posts postid}])]
       ;; Get eid of the topic created
       (:e (first (filter #(= title (:v %)) (:tx-data tx-result)))))))
 

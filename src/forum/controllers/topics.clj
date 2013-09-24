@@ -2,7 +2,8 @@
   (:use [hiccup element page util])
   (:require [forum.db]
             [forum.views.topics]
-            [forum.views.master :refer :all]))
+            [forum.views.master :refer :all]
+            [ring.util.response :refer [redirect]]))
 
 (defn show [forumid topicid]
   (when-let [forum (forum.db/get-forum (Long. forumid))]
@@ -16,3 +17,11 @@
                                   topic
                                   (sort-by :post/position
                                            posts)))))))
+
+(defn create [forumid topic]
+  (when-let [f (forum.db/get-forum (Long. forumid))]
+    (if-let [topicid (forum.db/create-topic (Long. forumid)
+                                            (:title topic)
+                                            (:text (:post topic)))]
+      (redirect (str "/forums/" forumid "/topics/" topicid))
+      "Error creating thread. ^_^")))

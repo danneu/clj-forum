@@ -22,6 +22,9 @@
     ;; /forums/:forumid
     (GET "/" []
       (forum.controllers.forums/show forumid))
+    ;; /forums/:forumid/topics
+    (POST "/topics" [topic]
+      (forum.controllers.topics/create forumid topic))
     (context ["/topics/:topicid", :topicid #"[0-9]+"] [topicid]
       ;; /forums/:forumid/topics/:topicid
       (GET "/" []
