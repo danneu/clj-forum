@@ -14,4 +14,4 @@
       (layout
        {:crumbs []}
        (forum.views.forums/show forum
-                                (sort-by :topic/uid topics))))))
+                                (sort-by :topic/uid > topics))))))

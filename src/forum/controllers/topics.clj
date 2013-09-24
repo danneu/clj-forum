@@ -16,7 +16,8 @@
                             (:forum/title forum))]}
          (forum.views.topics/show forum
                                   topic
-                                  (sort-by :post/uid posts)))))))
+                                  ;; Old posts come first
+                                  (sort-by :post/uid < posts)))))))
 
 (defn create [fuid topic]
   (when-let [forum (forum.db/get-forum fuid)]
