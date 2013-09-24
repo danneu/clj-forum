@@ -1,6 +1,8 @@
 (ns forum.views.forums
   (:use [hiccup core form page element util])
-  (:require [forum.views.master :refer :all]))
+  (:require [forum.views.master :refer :all]
+            [forum.db]
+            [forum.helpers :refer :all]))
 
 (defn index [forums]
   (html
@@ -16,7 +18,9 @@
    [:table.table
     (for [f forums]
       [:tr
-       [:td (link-to (url "/forums/" (:db/id f)) (:forum/title f))]])]))
+       [:td (link-to (url-for f)
+                     (:forum/title f))]
+       [:td (count (:forum/topics f)) " topics"]])]))
 
 (defn show [forum topics]
   (html
@@ -24,12 +28,10 @@
    [:table.table
     (for [t topics]
       [:tr
-       [:td (link-to (url "/forums/"
-                          (:db/id forum)
-                          "/topics/"
-                          (:db/id t))
-                     (:topic/title t))]
-       ;; FIXME: Pulling posts out of topic. I think this is too much knowledge for view.
+       [:td
+        (link-to (url-for t)
+                 (:topic/title t)) [:br]
+        "by " (link-to "/" "Username")]
        [:td (count (:topic/posts t)) " posts"]
        [:td (pretty-date (:topic/createdAt t))]])]
 

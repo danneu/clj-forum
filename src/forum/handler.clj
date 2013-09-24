@@ -8,12 +8,10 @@
             [forum.controllers.topics]))
 
 ;; - The Router should do preliminary checking on params so that
-;;   Controllers can expect to coerce, ex. (Long. "123"), without exception.
+;;   Controllers can expect to coerce, ex. (Long. "123"),
+;;   without exception. Hmm, I don't like having the remember
+;;   to coerce. Perhaps db-fns should handle strings.
 ;; - Controllers do all the DB calls and pass entities into Views.
-;; - Views shouldn't have to dig into nested resource like
-;;   have to pull the Posts out of a Topic entity. Instead, the Controller
-;;   should just pass in `topic` and `posts`. Or perhaps call a decorator fn that does it
-;;   for the View.
 
 (defroutes app-routes
   (GET "/" []

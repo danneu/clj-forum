@@ -1,14 +1,7 @@
 (ns forum.views.topics
   (:use [hiccup core element form util])
-  (:require [forum.views.master :refer :all]))
-
-;; TODO: Abstract urls somehow. Not this way tho. ^_^
-(defn gen-url
-  ([forum topic & rest]
-     (apply str
-            "/forums/" (:db/id forum)
-            "/topics/" (:db/id topic)
-            "/" (interpose "/" rest))))
+  (:require [forum.views.master :refer :all]
+            [forum.helpers :refer :all]))
 
 (defn show [forum topic posts]
   (html
@@ -25,7 +18,7 @@
    [:h3 "New Post"]
    (form-to
        {:role "form"}
-       [:post (gen-url forum topic "posts")]
+       [:post (str (url-for topic) "/posts")]
     [:div.form-group
      (text-area {:class "form-control"
                  :placeholder "Text"}
