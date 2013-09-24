@@ -34,8 +34,8 @@ resource that can be opened by io/reader."
     (transact-all conn "resources/data-functions.edn")
     conn))
 
-;; If DB is migrated just return conn, else seed it.
-(def conn (d/connect uri))
+;; (def conn (d/connect uri))
+(def conn (d/create-db))
 
 (defn tempid []
   (d/tempid :db.part/user))
@@ -182,7 +182,7 @@ resource that can be opened by io/reader."
 
 ;; Seed check ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(let [wipe? false]
+(let [wipe? true]
   (when (or (< 1 (count (get-all-posts)))
             wipe?)
     ;; Can I think of a better solution than redef?
