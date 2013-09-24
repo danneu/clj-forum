@@ -34,8 +34,8 @@ resource that can be opened by io/reader."
     (transact-all conn "resources/data-functions.edn")
     conn))
 
-(def conn (d/connect uri))
-;; (def conn (create-db))
+;; (def conn (d/connect uri))
+(def conn (create-db))
 
 (defn tempid []
   (d/tempid :db.part/user))
