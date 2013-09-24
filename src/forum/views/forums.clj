@@ -12,6 +12,7 @@
     [:p.lead "Where thugs get it free and you've gotta be a G."]
     [:p [:a.btn.btn-lg.btn-success {:href "/"} "Sign up"]]]
 
+   ;; List all forums. TODO: In position order.
    [:div.list-group.forum-list
     (for [forum forums]
       [:a.list-group-item {:href (url-for forum)}
@@ -31,6 +32,7 @@
   (html
    [:h2 (:forum/title forum)]
    
+   ;; List the topics in this forum
    [:table.table
     (for [topic topics]
       [:tr
