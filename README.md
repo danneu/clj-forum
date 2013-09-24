@@ -1,5 +1,7 @@
 # clj-forum
 
+[Live Demo](http://198.58.119.43:3000/) (Running in development mode.)
+
 - Database: Datomic
 - Templating: Hiccup
 - Routing: Compojure
