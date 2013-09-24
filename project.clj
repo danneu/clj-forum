@@ -1,6 +1,6 @@
 (defproject forum "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
+  :description "a forum build with Datomic and Clojure"
+  :url "http://github.com/danneu/clj-forum"
   :dependencies
   [[org.clojure/clojure "1.5.1"]
    [compojure "1.1.5"]
