@@ -183,9 +183,7 @@ resource that can be opened by io/reader."
 ;; Seed check ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (let [wipe? false]
-  (when (or (empty? (d/q '[:find ?e
-                           :where [?e :db/ident :topic/createdAt]]
-                         (d/db conn)))
+  (when (or (< 1 (count (get-all-posts)))
             wipe?)
     ;; Can I think of a better solution than redef?
     (def conn (create-db))
