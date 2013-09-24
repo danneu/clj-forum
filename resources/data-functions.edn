@@ -1,14 +1,33 @@
 [
+ ;;
+ ;; Couldn't figure out how to reuse txn-fns in other txn-fns.
+ ;;
+ ;; {:db/id #db/id[:db.part/user]
+ ;;  :db/ident :bumpPosition
+ ;;  :db/doc "Atomically adds to the end of a list of sorted cardinality/many lists"
+ ;;  :db/fn #db/fn {:lang "clojure"
+ ;;                 ;; [forum-eid :forum/topics topic-eid :topic/position]
+ ;;                 ;; [topic-eid :topic/posts  post-eid  :post/position]
+ ;;                 :requires [[datomic.api]]
+ ;;                 :params [db scope-id scope-attr new-id pos-attr]
+ ;;                 :code (let [children (scope-attr (datomic.api/entity db scope-id))
+ ;;                             highest-pos (reduce max 0 (map pos-attr children))]
+ ;;                         [[:db/add new-id pos-attr (inc highest-pos)]])}}
  {:db/id #db/id[:db.part/user]
-  :db/ident :bumpPosition
+  :db/ident :addTopicPosition
   :db/doc "Atomically adds to the end of a list of sorted cardinality/many lists"
   :db/fn #db/fn {:lang "clojure"
-                 ;; [forum-eid :forum/topics topic-eid :topic/position]
-                 ;; [topic-eid :topic/posts  post-eid  :post/position]
-                 :requires [[datomic.api]]
-                 :params [db scope-id scope-attr new-id pos-attr]
-                 :code (let [children (scope-attr (datomic.api/entity db scope-id))
-                             highest-pos (reduce max 0 (map pos-attr children))]
-                         [[:db/add new-id pos-attr (inc highest-pos)]])}}
+                 :params [db forumid topicid]
+                 :code (let [topics (:forum/topics (datomic.api/entity db forumid))
+                             highest-pos (reduce max 0 (map :topic/position topics))]
+                         [[:db/add topicid :topic/position (inc highest-pos)]])}}
+ {:db/id #db/id[:db.part/user]
+  :db/ident :addPostPosition
+  :db/doc "Atomically adds to the end of a list of sorted cardinality/many lists"
+  :db/fn #db/fn {:lang "clojure"
+                 :params [db topicid postid]
+                 :code (let [posts (:topic/posts (datomic.api/entity db topicid))
+                             highest-pos (reduce max 0 (map :post/position posts))]
+                         [[:db/add postid :post/position (inc highest-pos)]])}}
 
  ]

@@ -46,7 +46,9 @@ resource that can be opened by io/reader."
 ;; GET functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Should return entities
 
-(defn get-all-forums []
+(defn get-all-forums
+  "Returns entities"
+  []
   (let [res (q '[:find ?f
                  :where [?f :forum/title]])]
     (map (comp entity first) res)))
@@ -64,21 +66,21 @@ resource that can be opened by io/reader."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Creation functions should return eids
 
-(defn create-forum [title]
+(defn create-forum
+  "Returns entity ID of created forum."
+  [title]
   (let [tx-result @(d/transact conn
                                [{:db/id (tempid)
                                  :forum/title title}])]
     (:e (last (:tx-data tx-result)))))
 
-(defn create-topic [forumid title]
+(defn create-topic
+  "Returns entity ID of created topic."
+  [forumid title]
   (let [topicid (tempid)]
     (let [tx-result @(d/transact conn
                                  [{:db/id topicid :topic/title title}
-                                  [:bumpPosition
-                                   forumid
-                                   :forum/topics
-                                   topicid
-                                   :topic/position]
+                                  [:addTopicPosition forumid topicid]
                                   {:db/id forumid :forum/topics topicid}])]
       ;; Get eid of the topic created
       (:e (first (filter #(= title (:v %)) (:tx-data tx-result)))))))
@@ -93,31 +95,20 @@ resource that can be opened by io/reader."
                  topicid)]
     (entity (ffirst res))))
 
-(defn create-post [topicid text]
+(defn create-post
+  "Returns entity ID of created post."
+  [topicid text]
   (let [postid (tempid)]
     (let [tx-result @(d/transact conn
                                  [{:db/id postid :post/text text}
-                                  [:bumpPosition
-                                   topicid
-                                   :topic/posts
-                                   postid
-                                   :post/position]
+                                  [:addPostPosition topicid postid]
                                   {:db/id topicid :topic/posts postid}])]
       ;; Get eid of the post created
       (:e (first (filter #(= text (:v %)) (:tx-data tx-result)))))))
 
-(defn get-all-forums []
-  (let [res (q '[:find ?f
-                 :where [?f :forum/title]])]
-    (map (comp d/touch entity first) res)))
+;; Seed the DB ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn get-all-topics []
-  (let [res (q '[:find ?title ?position
-                 :where [?t :topic/title ?title]
-                        [?t :topic/position ?position]])]
-    res))
-
-;; Seed the DB
+;; Noise generators
 
 (defn generate-word
   "Generates a word 3 to 7 letters long."
@@ -134,6 +125,8 @@ resource that can be opened by io/reader."
         (clojure.string/join " " _)
         (clojure.string/capitalize _)
         (str _ ".")))
+
+;; FIXME: Generalize seed-db so I can scale it.
 
 (defn seed-db [conn]
   (let [forum1 (create-forum "Forum A")
