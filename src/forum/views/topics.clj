@@ -5,20 +5,24 @@
 
 (defn show [forum topic posts]
   (html
+   ;; Topic title
    [:h1 (:topic/title topic)]
+
+   ;; List posts
    [:ul.list-group
     (for [p posts]
       [:li.list-group-item
         [:div.row
          [:div.col-lg-2
           (link-to "/" "Username") [:br]
-          (pretty-date (:post/createdAt p))]
+          (pretty-date (:post/created p))]
          [:div.col-lg-10 (:post/text p)]]])]
 
+   ;; New post form
    [:h3 "New Post"]
    (form-to
        {:role "form"}
-       [:post (str (url-for topic) "/posts")]
+       [:post (str (url-for :topic topic) "/posts")]
     [:div.form-group
      (text-area {:class "form-control"
                  :placeholder "Text"}

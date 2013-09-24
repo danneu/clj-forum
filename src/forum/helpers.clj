@@ -1,4 +1,5 @@
-(ns forum.helpers)
+(ns forum.helpers
+  (:import [org.ocpsoft.prettytime PrettyTime]))
 
 ;; AKA orphaned functions
 
@@ -15,19 +16,24 @@
 
 (defn url-for
   "Here's my URL abstraction. Just pass in entity."
-  [e]
+  [type e]
   (let [eid (:db/id e)]
-    (cond
-     (:forum/title e) (str "/forums/" eid)
-     (:topic/title e) (str (url-for (parent-forum e))
-                           "/topics/"
-                           eid))))
+    (case type
+      :forum (str "/forums/" (:forum/uid e))
+      :topic (str (url-for :forum (parent-forum e))
+                  "/topics/" (:topic/uid e)))))
 
 (defn latest-topic
   "Given a forum entity, returns latest topic
    by createdAt although it should be by latest post bump."
   [forum]
-  (first (sort-by :topic/createdAt
+  (first (sort-by :topic/created
                   #(- ( .compareTo %1 %2))
                   (:forum/topics forum))))
+
+(defn pretty-date
+  "Turn Date into string of 'about 10 minutes ago'."
+  [date]
+  (.format (PrettyTime.) date))
+
 

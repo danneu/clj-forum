@@ -3,13 +3,10 @@
             [ring.util.response :refer [redirect]]))
 
 ;; post: {:text ""}
-(defn create [forumid topicid post]
+(defn create [fuid tuid post-params]
   ;; TODO: Add post validation
-  ;; FIXME: I sorta don't like having to remember to do the Long. casts in
-  ;;        Controllers. Perhaps I should move to forum.db.
-  (println (prn forumid) topicid post)
-  (when-let [f (forum.db/get-forum (Long. forumid))]
-    (when-let [t (forum.db/get-topic (Long. topicid))]
-      (if-let [postid (forum.db/create-post (Long. topicid) (:text post))]
-        (redirect (str "/forums/" forumid "/topics/" topicid))
+  (when-let [forum (forum.db/get-forum fuid)]
+    (when-let [topic (forum.db/get-topic tuid)]
+      (if-let [puid (forum.db/create-post tuid (:text post-params))]
+        (redirect (str "/forums/" fuid "/topics/" tuid))
         "Error creating post. ^_^"))))

@@ -6,7 +6,6 @@
 
 (defn index [forums]
   (html
-
    ;; Jumbotron only should annoy guests on forumlist.
    [:div.jumbotron
     [:h1 "clj-forum"]
@@ -15,7 +14,7 @@
 
    [:div.list-group.forum-list
     (for [forum forums]
-      [:a.list-group-item {:href (url-for forum)}
+      [:a.list-group-item {:href (url-for :forum forum)}
        [:div.row
         [:div.col-lg-8
          [:h4.list-group-item-heading.forum-title
@@ -23,7 +22,7 @@
          [:p.list-group-item-text (:forum/desc forum)]]
         [:div.col-lg-4.forum-meta
          (str (count (:forum/topics forum)) " topics") [:br]
-         (str (pretty-date (:topic/createdAt (latest-topic forum))))
+         (str (pretty-date (:topic/created (latest-topic forum))))
          ]
         ]])
     ]))
@@ -36,11 +35,11 @@
     (for [t topics]
       [:tr
        [:td
-        (link-to (url-for t)
+        (link-to (url-for :topic t)
                  (:topic/title t)) [:br]
         "by " (link-to "/" "Username")]
        [:td (count (:topic/posts t)) " posts"]
-       [:td (pretty-date (:topic/createdAt t))]])]
+       [:td (pretty-date (:topic/created t))]])]
 
    [:h3 "New Topic"]
    (form-to

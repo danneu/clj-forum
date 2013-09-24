@@ -3,19 +3,30 @@
  ;; :forum/title one string
  {:db/id #db/id[:db.part/db]
   :db/ident :forum/title
+  :db/doc "A forum's title."
   :db/valueType :db.type/string        
   :db/cardinality :db.cardinality/one
   :db.install/_attribute :db.part/db}
  ;; :forum/topics many ref
  {:db/id #db/id[:db.part/db]
   :db/ident :forum/topics
+  :db/doc "A forum's child topics."
   :db/valueType :db.type/ref
   :db/cardinality :db.cardinality/many
   :db.install/_attribute :db.part/db}
  ;; :forum/desc one string
  {:db/id #db/id[:db.part/db]
   :db/ident :forum/desc
+  :db/doc "A forum's description."
   :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
+ ;; :forum/uid one Long
+ {:db/id #db/id[:db.part/db]
+  :db/ident :forum/uid
+  :db/doc "A forum's public ID."
+  :db/unique :db.unique/identity
+  :db/valueType :db.type/long
   :db/cardinality :db.cardinality/one
   :db.install/_attribute :db.part/db}
 
@@ -23,25 +34,30 @@
  ;; :topic/title one string
  {:db/id #db/id[:db.part/db]
   :db/ident :topic/title
+  :db/doc "A topic's title."
   :db/valueType :db.type/string        
-  :db/cardinality :db.cardinality/one
-  :db.install/_attribute :db.part/db}
- ;; :topic/position one long
- {:db/id #db/id[:db.part/db]
-  :db/ident :topic/position
-  :db/valueType :db.type/long
   :db/cardinality :db.cardinality/one
   :db.install/_attribute :db.part/db}
  ;; :topic/posts many ref
  {:db/id #db/id[:db.part/db]
   :db/ident :topic/posts
+  :db/doc "A topic's posts."
   :db/valueType :db.type/ref        
   :db/cardinality :db.cardinality/many
   :db.install/_attribute :db.part/db}
- ;; :topic/createdAt one instant
+ ;; :topic/created one instant
  {:db/id #db/id[:db.part/db]
-  :db/ident :topic/createdAt
+  :db/ident :topic/created
+  :db/doc "When a topic was created."
   :db/valueType :db.type/instant
+  :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
+ ;; :topic/uid
+ {:db/id #db/id[:db.part/db]
+  :db/ident :topic/uid
+  :db/doc "A topic's public ID."
+  :db/unique :db.unique/identity
+  :db/valueType :db.type/long
   :db/cardinality :db.cardinality/one
   :db.install/_attribute :db.part/db}
 
@@ -49,19 +65,23 @@
  ;; :post/text one string
  {:db/id #db/id[:db.part/db]
   :db/ident :post/text
+  :db/doc "A post's text body."
   :db/valueType :db.type/string        
   :db/cardinality :db.cardinality/one
   :db.install/_attribute :db.part/db}
- ;; :post/position one long
+ ;; :post/created one instant
  {:db/id #db/id[:db.part/db]   
-  :db/ident :post/position
-  :db/valueType :db.type/long
+  :db/ident :post/created
+  :db/doc "When a post was created."
+  :db/valueType :db.type/instant
   :db/cardinality :db.cardinality/one
   :db.install/_attribute :db.part/db}
- ;; :post/createdAt one instant
+ ;; :post/uid one long
  {:db/id #db/id[:db.part/db]   
-  :db/ident :post/createdAt
-  :db/valueType :db.type/instant
+  :db/ident :post/uid
+  :db/unique :db.unique/identity
+  :db/doc "A post's public ID."
+  :db/valueType :db.type/long
   :db/cardinality :db.cardinality/one
   :db.install/_attribute :db.part/db}
 

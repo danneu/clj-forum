@@ -1,6 +1,9 @@
 [
- ;;
  ;; Couldn't figure out how to reuse txn-fns in other txn-fns.
+ ;;
+ ;; I don't need position anymore since I can just sort by uid.
+ ;; uids are always in order unless I decide to start to fill in for holes in
+ ;; deleted uids.
  ;;
  ;; {:db/id #db/id[:db.part/user]
  ;;  :db/ident :bumpPosition
@@ -13,21 +16,31 @@
  ;;                 :code (let [children (scope-attr (datomic.api/entity db scope-id))
  ;;                             highest-pos (reduce max 0 (map pos-attr children))]
  ;;                         [[:db/add new-id pos-attr (inc highest-pos)]])}}
+
+ ;; uid incrementers
+ ;;
+ ;; - uid is the public ID of entities. 
+ ;; - I manually increment uid to replicate autoincrement
+ ;;   behavior I'm used to in other databases.
+ ;; - I can't use :db/id for the public ID (like in
+ ;;   a URL /forums/:id) because :db/id is Datomic's internal ID
+ ;;   and it will be regenerated whenever, say, I have to
+ ;;   import data from a backup. Leaning on :db/id would invalidate
+ ;;   all existing URLs.
+ ;; - uids are incremented only in the scope of other topics,
+ ;;   posts, forums, etc.
+
  {:db/id #db/id[:db.part/user]
-  :db/ident :addTopicPosition
-  :db/doc "Atomically adds to the end of a list of sorted cardinality/many lists"
+  :db/ident :addUID
   :db/fn #db/fn {:lang "clojure"
-                 :params [db forumid topicid]
-                 :code (let [topics (:forum/topics (datomic.api/entity db forumid))
-                             highest-pos (reduce max 0 (map :topic/position topics))]
-                         [[:db/add topicid :topic/position (inc highest-pos)]])}}
- {:db/id #db/id[:db.part/user]
-  :db/ident :addPostPosition
-  :db/doc "Atomically adds to the end of a list of sorted cardinality/many lists"
-  :db/fn #db/fn {:lang "clojure"
-                 :params [db topicid postid]
-                 :code (let [posts (:topic/posts (datomic.api/entity db topicid))
-                             highest-pos (reduce max 0 (map :post/position posts))]
-                         [[:db/add postid :post/position (inc highest-pos)]])}}
+                 :params [db new-eid attr]
+                 :code (let [res (datomic.api/q
+                                  '[:find (max ?uid)
+                                    :in $ ?attr
+                                    :where [_ ?attr ?uid]]
+                                  db
+                                  attr)
+                             new-uid (inc (or (ffirst res) 0))]
+                         [[:db/add new-eid attr new-uid]])}}
 
  ]

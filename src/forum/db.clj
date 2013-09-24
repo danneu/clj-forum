@@ -1,10 +1,10 @@
 (ns forum.db
   (:require [datomic.api :as d]
             [clojure.java.io :as io]
-            [clojure.pprint :refer [pprint]])
+            [clojure.pprint :refer [pprint]]
+            [forum.helpers :refer :all])
   (:import [datomic Util]
-           [java.util Date]
-           [org.ocpsoft.prettytime PrettyTime]))
+           [java.util Date]))
 
 ;; Utils ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -34,8 +34,8 @@ resource that can be opened by io/reader."
     (transact-all conn "resources/data-functions.edn")
     conn))
 
-;; (def conn (d/connect uri))
-(def conn (create-db))
+(def conn (d/connect uri))
+;; (def conn (create-db))
 
 (defn tempid []
   (d/tempid :db.part/user))
@@ -58,72 +58,78 @@ resource that can be opened by io/reader."
 
 (defn get-forum
   "Returns entity or nil"
-  [forumid]
+  [fuid]
   (let [res (d/q '[:find ?f
-                   :in $ ?f
-                   :where [?f :forum/title]]
+                   :in $ ?fuid
+                   :where [?f :forum/uid ?fuid]]
                  (d/db conn)
-                 forumid)]
+                 fuid)]
     (entity (ffirst res))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Creation functions should return eids
 
 (defn create-forum
-  "Returns entity ID of created forum."
+  "Returns uid of created forum."
   [title desc]
-  (let [tx-result @(d/transact conn
-                               [{:db/id (tempid)
+  (let [feid (tempid)
+        tx-result @(d/transact conn
+                               [{:db/id feid
                                  :forum/title title
-                                 :forum/desc desc}])]
-    (:e (last (:tx-data tx-result)))))
+                                 :forum/desc desc}
+                                [:addUID feid :forum/uid]])]
+    (:forum/uid (entity (:e (last (:tx-data tx-result)))))))
 
 (defn create-topic
-  "Returns entity ID of created topic."
-  [forumid title text]
-  (let [topicid (tempid)
-        postid (tempid)
+  "Returns uid of created topic."
+  [fuid title text]
+  (let [teid (tempid)
+        peid (tempid)
         now (Date.)]
     (let [tx-result
           @(d/transact conn
                        [;; Make topic
-                        {:db/id topicid
+                        {:db/id teid
                          :topic/title title
-                         :topic/createdAt now}
-                        [:addTopicPosition forumid topicid]
-                        {:db/id forumid :forum/topics topicid}
+                         :topic/created now}
+                        [:addUID teid :topic/uid]
+
+                        ;; Add topic to forum
+                        {:forum/uid fuid :forum/topics teid :db/id (tempid)}
 
                         ;; Make post
-                        {:db/id postid
+                        {:db/id peid
                          :post/text text
-                         :post/createdAt now}
-                        [:addPostPosition topicid postid]
-                        {:db/id topicid :topic/posts postid}])]
-      ;; Get eid of the topic created
-      (:e (first (filter #(= title (:v %)) (:tx-data tx-result)))))))
+                         :post/created now}
+                        [:addUID peid :post/uid]
+                        {:db/id teid :topic/posts peid}])]
+      ;; Get uid of the topic created
+      (:topic/uid (entity (:e (first (filter #(= title (:v %)) (:tx-data tx-result)))))))))
 
 (defn get-topic
   "Returns entity or nil"
-  [topicid]
+  [tuid]
   (let [res (d/q '[:find ?t
-                   :in $ ?t
-                   :where [?t :topic/title]]
+                   :in $ ?tuid
+                   :where [?t :topic/uid ?tuid]]
                  (d/db conn)
-                 topicid)]
+                 tuid)]
     (entity (ffirst res))))
 
 (defn create-post
-  "Returns entity ID of created post."
-  [topicid text]
-  (let [postid (tempid)]
+  "Returns uid of created post."
+  [tuid text]
+  (let [peid (tempid)]
     (let [tx-result @(d/transact conn
-                                 [{:db/id postid
+                                 ;; Create post
+                                 [{:db/id peid
                                    :post/text text
-                                   :post/createdAt (Date.)}
-                                  [:addPostPosition topicid postid]
-                                  {:db/id topicid :topic/posts postid}])]
-      ;; Get eid of the post created
-      (:e (first (filter #(= text (:v %)) (:tx-data tx-result)))))))
+                                   :post/created (Date.)}
+                                  [:addUID peid :post/uid]
+                                  ;; Add post to topic with this tuid
+                                  {:topic/uid tuid :topic/posts peid :db/id (tempid)}])]
+      ;; Get uid of the post created
+      (:post/uid (entity (:e (first (filter #(= text (:v %)) (:tx-data tx-result)))))))))
 
 ;; Seed the DB ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -166,7 +172,8 @@ resource that can be opened by io/reader."
          topic
          (clojure.string/join
           " "
-          (take 3 (repeatedly generate-sentence))))))))
+          (take 3 (repeatedly generate-sentence))))))
+    conn))
 
 (defn get-all-topics []
   (let [res (d/q '[:find ?t
@@ -182,8 +189,8 @@ resource that can be opened by io/reader."
 
 ;; Seed check ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(let [wipe? true]
-  (when (or (< 1 (count (get-all-posts)))
+(let [wipe? false]
+  (when (or (> 1 (count (get-all-posts)))
             wipe?)
     ;; Can I think of a better solution than redef?
     (def conn (create-db))
@@ -191,5 +198,9 @@ resource that can be opened by io/reader."
 
 ;; Show total post count on file eval (sanity check)
 
-(count (get-all-posts))
+(let [posts (get-all-posts)]
+  {:post-count (count posts)
+   :latest-post ((comp :post/created first) (sort-by :post/uid #(> %1 %2) (get-all-posts)))
+})
+
 
