@@ -56,7 +56,7 @@ resource that can be opened by io/reader."
   [forumid]
   (let [res (d/q '[:find ?f
                    :in $ ?f
-                   :where [?f]]
+                   :where [?f :forum/title]]
                  (d/db conn)
                  forumid)]
     (entity (ffirst res))))
@@ -82,6 +82,16 @@ resource that can be opened by io/reader."
                                   {:db/id forumid :forum/topics topicid}])]
       ;; Get eid of the topic created
       (:e (first (filter #(= title (:v %)) (:tx-data tx-result)))))))
+
+(defn get-topic
+  "Returns entity or nil"
+  [topicid]
+  (let [res (d/q '[:find ?t
+                   :in $ ?t
+                   :where [?t :topic/title]]
+                 (d/db conn)
+                 topicid)]
+    (entity (ffirst res))))
 
 (defn create-post [topicid text]
   (let [postid (tempid)]
@@ -109,18 +119,33 @@ resource that can be opened by io/reader."
 
 ;; Seed the DB
 
+(defn generate-word
+  "Generates a word 3 to 7 letters long."
+  []
+  (clojure.string/join
+   (take (+ 3 (rand-int 5))
+         (repeatedly #(rand-nth "abcdefghijklmnopqrstuvwxyz")))))
+
+(defn generate-post-text
+  "Generates a string of words between 7 and 27 words long."
+  []
+  (as-> (+ 7 (rand-int 21)) _
+        (take _ (repeatedly generate-word))
+        (clojure.string/join " " _)
+        (clojure.string/capitalize _)
+        (str _ ".")))
+
 (defn seed-db [conn]
   (let [forum1 (create-forum "Forum A")
         forum2 (create-forum "Forum B")
         forum3 (create-forum "Forum C")]
-    (create-topic forum1 "Topic 1")
-    (create-topic forum1 "Topic 2")
-    (create-topic forum1 "Topic 3")
-    (create-topic forum2 "Topic 4")
-    (create-topic forum2 "Topic 5")
-    (create-topic forum2 "Topic 6")
-    (create-topic forum3 "Topic 7")
-    (create-topic forum3 "Topic 8")
-    (create-topic forum3 "Topic 9")))
+    (let [forum1-topics (map (partial create-topic forum1)
+                             ["Topic 1" "Topic 2" "Topic 3"])
+          forum2-topics (map (partial create-topic forum2)
+                             ["Topic 4" "Topic 5" "Topic 6"])
+          forum3-topics (map (partial create-topic forum3)
+                             ["Topic 7" "Topic 8" "Topic 9"])]
+      (doseq [t (flatten [forum1-topics forum2-topics forum3-topics])]
+        (dotimes [_ 3] (create-post t (generate-post-text)))))))
 
 (seed-db conn)

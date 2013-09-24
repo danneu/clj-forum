@@ -32,7 +32,7 @@
           (let [forum1 (create-forum "Forum 1")]
             (:forum/title (get-forum forum1)))))
 
-;; TOPIC CREATION ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; TOPIC ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; create-topic should create a topic entity
 (expect #{["Topic 1"]}
@@ -65,6 +65,14 @@
             (q '[:find ?title ?pos
                  :where [?t :topic/title ?title]
                         [?t :topic/position ?pos]]))))
+
+;; get-topic should return single topic
+(expect "Topic 1"
+        (with-redefs [conn (create-test-db)]
+          (let [forum1 (create-forum "Forum 1")
+                topic1 (create-topic forum1 "Topic 1")]
+            (:topic/title (get-topic topic1)))))
+
 
 ;; create-topic should add topic to :forum/topics
 (expect [[3]]
