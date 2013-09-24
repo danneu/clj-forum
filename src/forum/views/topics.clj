@@ -22,7 +22,7 @@
    [:h3 "New Post"]
    (form-to
        {:role "form"}
-       [:post (str (url-for :topic topic) "/posts")]
+       [:post (str (url-for topic) "/posts")]
     [:div.form-group
      (text-area {:class "form-control"
                  :placeholder "Text"}

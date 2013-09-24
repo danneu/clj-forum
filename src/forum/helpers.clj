@@ -16,12 +16,12 @@
 
 (defn url-for
   "Here's my URL abstraction. Just pass in entity."
-  [type e]
+  [e]
   (let [eid (:db/id e)]
-    (case type
-      :forum (str "/forums/" (:forum/uid e))
-      :topic (str (url-for :forum (parent-forum e))
-                  "/topics/" (:topic/uid e)))))
+    (cond
+     (:forum/uid e) (str "/forums/" (:forum/uid e))
+     (:topic/uid e) (str (url-for (parent-forum e))
+                         "/topics/" (:topic/uid)))))
 
 (defn latest-topic
   "Given a forum entity, returns latest topic

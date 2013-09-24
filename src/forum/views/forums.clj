@@ -14,7 +14,7 @@
 
    [:div.list-group.forum-list
     (for [forum forums]
-      [:a.list-group-item {:href (url-for :forum forum)}
+      [:a.list-group-item {:href (url-for forum)}
        [:div.row
         [:div.col-lg-8
          [:h4.list-group-item-heading.forum-title
@@ -32,20 +32,20 @@
    [:h2 (:forum/title forum)]
    
    [:table.table
-    (for [t topics]
+    (for [topic topics]
       [:tr
        [:td
-        (link-to (url-for :topic t)
+        (link-to (url-for topic)
                  (:topic/title t)) [:br]
         "by " (link-to "/" "Username")]
-       [:td (count (:topic/posts t)) " posts"]
-       [:td (pretty-date (:topic/created t))]])]
+       [:td (count (:topic/posts topic)) " posts"]
+       [:td (pretty-date (:topic/created topic))]])]
 
    ;; New topic form
    [:h3 "New Topic"]
    (form-to
        {:role "form"}
-       [:post (str (url-for :forum forum) "/topics")]
+       [:post (str (url-for forum) "/topics")]
     [:div.form-group
      (text-field {:class "form-control"
                   :placeholder "Title"}
