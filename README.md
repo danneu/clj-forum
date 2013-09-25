@@ -23,6 +23,16 @@
 - `cd clj-forum`
 - `lein ring server`
 
+## TODO
+
+- Figure out some less tedious flash message abstraction or a better way to shuffle them along as they appear. Put them in master layout?
+- Clean up `db/create-db` vs `db/seed-db` vs `d/connect conn` so I don't have to keep switching.
+- Clean up db namespace.
+
+## Notes
+
+- `:flash` messages will be maps where keys zip to [Twitter Bootstrap alert styles](http://getbootstrap.com/2.3.2/components.html#alerts): error, success, info, warn.
+
 ## Implementation
 
 I'm figuring things out as I go and leaning on Rails familiarities.
@@ -41,11 +51,11 @@ UIDs are only incremented in the scope of like-entities. If you create one forum
 
 - URLs have gone from:
 
-    http://localhost:3000/forums/17592186045421/topics/17592186045427
+        http://localhost:3000/forums/17592186045421/topics/17592186045427
     
-to:
+    to:
 
-    http://localhost:3000/forums/1/topics/1
+        http://localhost:3000/forums/1/topics/1
 
 - :db/id is internal to Datomic, so it's regenerated any time, for example, the data is restored from a database.
 
