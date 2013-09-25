@@ -4,8 +4,9 @@
   (:require [expectations :refer :all]))
 
 ;; Should 404 when forumid or topicid are not numeric (Instead of crash).
-(expect 404 (:status (app (request :get "/forums/abc"))))
-(expect 404 (:status (app (request :get "/forums/abc/topics/def"))))
+;; (expect 404 (:status (app (request :get "/forums/abc"))))
+;; (expect 404 (:status (app (request :get "/forums/abc/topics/def"))))
+
 
 ;; (deftest test-app
 ;;   (testing "main route"

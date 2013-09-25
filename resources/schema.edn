@@ -85,4 +85,36 @@
   :db/cardinality :db.cardinality/one
   :db.install/_attribute :db.part/db}
 
+
+ ;; User
+ ;; :user/u one string
+ {:db/id #db/id[:db.part/db]
+  :db/ident :user/uname
+  :db/doc "A user's username."
+  :db/unique :db.unique/value
+  :db/valueType :db.type/string        
+  :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
+ ;; :user/p one string
+ {:db/id #db/id[:db.part/db]
+  :db/ident :user/digest
+  :db/doc "A user's hashed password."
+  :db/valueType :db.type/string        
+  :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
+ ;; :user/created one instant
+ {:db/id #db/id[:db.part/db]   
+  :db/ident :user/created
+  :db/doc "When a user was created."
+  :db/valueType :db.type/instant
+  :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
+ ;; :user/uid one long
+ {:db/id #db/id[:db.part/db]   
+  :db/ident :user/uid
+  :db/unique :db.unique/identity
+  :db/doc "A user's public ID."
+  :db/valueType :db.type/long
+  :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
  ]

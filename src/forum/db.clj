@@ -2,7 +2,8 @@
   (:require [datomic.api :as d]
             [clojure.java.io :as io]
             [clojure.pprint :refer [pprint]]
-            [forum.helpers :refer :all])
+            [forum.helpers :refer :all]
+            [forum.authentication])
   (:import [datomic Util]
            [java.util Date]))
 
@@ -34,8 +35,12 @@ resource that can be opened by io/reader."
     (transact-all conn "resources/data-functions.edn")
     conn))
 
-;; (def conn (d/connect uri))
-(def conn (create-db))
+(defn create-test-db []
+  (with-redefs [uri "datomic:mem://forum-test"]
+    (create-db)))
+
+(def conn (d/connect uri))
+;; (def conn (create-db))
 
 (defn tempid []
   (d/tempid :db.part/user))
@@ -66,8 +71,37 @@ resource that can be opened by io/reader."
                  fuid)]
     (entity (ffirst res))))
 
+;; User ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn create-user [uname pwd]
+  (let [digest (forum.authentication/encrypt pwd)
+        ueid (tempid)
+        res @(d/transact conn
+                         [{:db/id ueid
+                           :user/uname uname
+                           :user/digest digest
+                           :user/created (Date.)}
+                          [:addUID ueid :user/uid]])]
+    res))
+
+(defn get-user-by-uname [uname]
+  (let [res (d/q '[:find ?u
+                   :in $ ?uname
+                   :where [?u :user/uname ?uname]]
+                 (d/db conn)
+                 uname)]
+    (entity (ffirst res))))
+
+(defn get-user-by-uid [uid]
+  (let [res (d/q '[:find ?u
+                   :in $ ?uid
+                   :where [?u :user/uid ?uid]]
+                 (d/db conn)
+                 uid)]
+    (entity (ffirst res))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Creation functions should return eids
+;; Creation functions should return uids
 
 (defn create-forum
   "Returns uid of created forum."
@@ -202,5 +236,3 @@ resource that can be opened by io/reader."
   {:post-count (count posts)
    :latest-post ((comp :post/created first) (sort-by :post/uid #(> %1 %2) (get-all-posts)))
 })
-
-

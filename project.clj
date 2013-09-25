@@ -8,6 +8,7 @@
    [org.ocpsoft.prettytime/prettytime "3.1.0.Final"]
    [hiccup "1.0.4"]
    [ring "1.2.0"]
+   [org.jasypt/jasypt "1.9.1"]
    [expectations "1.4.55"]]
   :plugins [[lein-ring "0.8.5"]]
   :ring {:handler forum.handler/app}

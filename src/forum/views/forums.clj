@@ -10,7 +10,7 @@
    [:div.jumbotron
     [:h1 "clj-forum"]
     [:p.lead "Where thugs get it free and you've gotta be a G."]
-    [:p [:a.btn.btn-lg.btn-success {:href "/"} "Sign up"]]]
+    [:p [:a.btn.btn-lg.btn-success {:href "/users/new"} "Sign up"]]]
 
    ;; List all forums. TODO: In position order.
    [:div.list-group.forum-list

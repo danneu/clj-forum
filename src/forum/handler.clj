@@ -1,11 +1,13 @@
 (ns forum.handler
-  (:use [compojure.core])
+  (:use [compojure.core]
+        [clojure.pprint])
   (:require [ring.adapter.jetty :refer [run-jetty]]
             [compojure.handler :as handler]
             [compojure.route :as route]
             [forum.controllers.forums]
             [forum.controllers.posts]
-            [forum.controllers.topics]))
+            [forum.controllers.topics]
+            [forum.controllers.users]))
 
 ;; - The Router should do preliminary checking on params.
 ;;   I've decided to cast params to Longs in the Router instead
@@ -32,6 +34,12 @@
         (forum.controllers.posts/create (Long. fuid)
                                         (Long. tuid)
                                         post))))
+  (GET "/users/new" [_ :as req]
+    (pprint req)
+    (let [flash (:flash req)]
+      (forum.controllers.users/new flash)))
+  (POST "/users/create" [user]
+    (forum.controllers.users/create user))
   (route/resources "/")
   (route/not-found "Not Found"))
 
@@ -40,9 +48,9 @@
 
 ;; Server
 
-(defn start-server [port]
-  (run-jetty app {:port port}))
+;; (defn start-server [port]
+;;   (run-jetty app {:port port}))
 
-(defn -main [& args]
-  (let [port (Integer. (or (first args) "5010"))]
-    (start-server port)))
+;; (defn -main [& args]
+;;   (let [port (Integer. (or (first args) "5010"))]
+;;     (start-server port)))
