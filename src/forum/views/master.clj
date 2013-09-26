@@ -34,7 +34,14 @@
        [:div.footer
         [:p.pull-right
          "Source code at "
-         (link-to "http://github.com/danneu/clj-forum" "github")]]]]
+         (link-to "http://github.com/danneu/clj-forum" "github")]]
+
+        (link-to "https://github.com/danneu/clj-forum"
+          (image {:style "position: absolute;
+                          top: 0; right: 0; border: 0;"}
+                 "https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png"
+                 "Fork me on Github"))
+        ]]
 
 
        ;(render-crumbs (:crumbs opts))
