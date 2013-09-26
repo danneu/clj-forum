@@ -38,7 +38,6 @@
                                         (Long. tuid)
                                         post))))
   (GET "/users/new" [_ :as req]
-    (pprint req)
     (let [flash (:flash req)]
       (forum.controllers.users/new flash)))
   (POST "/users/create" [user]
