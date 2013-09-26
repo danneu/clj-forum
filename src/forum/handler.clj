@@ -2,12 +2,15 @@
   (:use [compojure.core]
         [clojure.pprint])
   (:require [ring.adapter.jetty :refer [run-jetty]]
+            [clojure.java.io :as io]
             [compojure.handler :as handler]
             [compojure.route :as route]
             [forum.controllers.forums]
             [forum.controllers.posts]
             [forum.controllers.topics]
-            [forum.controllers.users]))
+            [forum.controllers.users]
+            [forum.middleware.expose-request :refer [expose-request]]
+            [ring.middleware.session.cookie :refer [cookie-store]]))
 
 ;; - The Router should do preliminary checking on params.
 ;;   I've decided to cast params to Longs in the Router instead
@@ -43,8 +46,17 @@
   (route/resources "/")
   (route/not-found "Not Found"))
 
+(def config
+  ;; {:session-secret String}
+  (read-string (slurp (io/resource "config.edn"))))
+
 (def app
-  (handler/site app-routes))
+  (handler/site (expose-request app-routes)
+                ;; Store session in cookie that's encrypted
+                ;; with AES key defined as :session-secret config.edn.
+                {:session
+                 {:store (cookie-store
+                          {:key (:session-secret config)})}}))
 
 ;; Server
 
