@@ -4,22 +4,20 @@ var $button = $("#toggle-request-map"),
 function updateVisibility() {
   if (localStorage["show-request-map?"]) {
     $output.css("display", "block");
+    $button.addClass("btn-success");
+    $button.removeClass("btn-default");
   } else {
     $output.css("display", "none");
+    $button.addClass("btn-default");
+    $button.removeClass("btn-success");
   }
 }
 
 $button.click(function() {
   if (localStorage["show-request-map?"]) {
-    // Hiding it
-    $button.addClass("btn-default");
-    $button.removeClass("btn-success");
     delete localStorage["show-request-map?"];
   } else {
-    // Displaying it
     localStorage["show-request-map?"] = true
-    $button.addClass("btn-success");
-    $button.removeClass("btn-default");
   }
   updateVisibility();
 });
