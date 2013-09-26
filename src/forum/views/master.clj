@@ -35,14 +35,9 @@
 
         (render-crumbs (:crumbs opts))
 
-        [:pre#request-map
-         (let [w (StringWriter.)]
-           (clojure.pprint/pprint req w)
-           (.toString w))]
-
         view 
 
-        [:div.footer
+        [:div.footer.clearfix
          [:p.pull-right
           "Source code at "
           (link-to "http://github.com/danneu/clj-forum" "github")]]
@@ -52,13 +47,22 @@
                           top: 0; right: 0; border: 0;"}
                         "https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png"
                         "Fork me on Github"))
-        ]
 
-       ;; Debug bar
-       [:style "body { padding-bottom: 70px; }"]  ; 20px default + 50px debug bar height
-       [:nav#debug-bar.navbar.navbar-inverse.navbar-fixed-bottom
-        [:div.navbar-header [:a.navbar-brand "Debug"]]
-        [:button#toggle-request-map.btn.btn-default.navbar-btn {:type "button"} "Toggle request-map"]]
+        ;; Debug
+        [:div#request-map
+         [:pre
+          (let [w (StringWriter.)]
+            (clojure.pprint/pprint req w)
+            (.toString w))]]
+
+
+        ;; Debug bar
+        [:style "body { padding-bottom: 70px; }"]  ; 20px default + 50px debug bar height
+        [:nav#debug-bar.navbar.navbar-inverse.navbar-fixed-bottom
+         [:div.navbar-header [:a.navbar-brand "Debug"]]
+         [:button#toggle-request-map.btn.btn-default.navbar-btn {:type "button"} "Toggle request-map"]]
+
+        ]
 
        (include-js "//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js")
        (include-js "//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js")
