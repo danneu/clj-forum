@@ -20,7 +20,7 @@
      (html5
       [:head
        [:title "Forum"]
-       (include-css "/bootstrap/css/bootstrap.css")
+       (include-css "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css")
        (include-css "/css/bootstrap-override.css")]
       [:body
 
@@ -60,6 +60,7 @@
         [:div.navbar-header [:a.navbar-brand "Debug"]]
         [:button#toggle-request-map.btn.btn-default.navbar-btn {:type "button"} "Toggle request-map"]]
 
+       (include-js "//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js")
        (include-js "//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js")
        (include-js "/js/debug.js")
        
