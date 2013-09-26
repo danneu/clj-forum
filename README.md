@@ -1,6 +1,6 @@
 # clj-forum
 
-[Live Demo](http://198.58.119.43:3000/) (Running in development mode.)
+[Live Demo](http://198.58.119.43:3000/) (Running in development mode and probably not n*sync with this repo.)
 
 - Database: Datomic
 - Templating: Hiccup
