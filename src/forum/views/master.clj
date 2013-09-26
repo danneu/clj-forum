@@ -19,7 +19,7 @@
   ([opts view]
      (html5
       [:head
-       [:title "Forum"]
+       [:title "clj-forum"]
        (include-css "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css")
        (include-css "/css/bootstrap-override.css")]
       [:body
@@ -31,7 +31,7 @@
           [:li (link-to "/" "Home")]
           [:li (link-to "/" "About")]
           [:li (link-to "/" "Contact")]]
-         [:h3 (link-to "/" "Forum")]]
+         [:h3 (link-to "/" "clj-forum")]]
 
         (render-crumbs (:crumbs opts))
 
@@ -55,20 +55,18 @@
             (clojure.pprint/pprint req w)
             (.toString w))]]
 
-
         ;; Debug bar
         [:style "body { padding-bottom: 70px; }"]  ; 20px default + 50px debug bar height
         [:nav#debug-bar.navbar.navbar-inverse.navbar-fixed-bottom
          [:div.navbar-header [:a.navbar-brand "Debug"]]
          [:button#toggle-request-map.btn.btn-default.navbar-btn {:type "button"} "Toggle request-map"]]
 
-        ]
+        ] ;/container
 
        (include-js "//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js")
        (include-js "//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js")
        (include-js "/js/debug.js")
        
        ]  ;/body
-
 
       )))
