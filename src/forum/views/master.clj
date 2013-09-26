@@ -3,7 +3,7 @@
 
 (defn render-crumbs [crumbs]
   (when crumbs
-    [:ul
+    [:ol.breadcrumb
      [:li (link-to "/" "Home")]
      (for [c crumbs]
        [:li c])]))
@@ -29,6 +29,8 @@
           [:li (link-to "/" "Contact")]]
          [:h3 (link-to "/" "Forum")]]
 
+       (render-crumbs (:crumbs opts))
+
         view 
 
        [:div.footer
@@ -44,5 +46,4 @@
         ]]
 
 
-       ;(render-crumbs (:crumbs opts))
       )))
