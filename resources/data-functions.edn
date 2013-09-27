@@ -1,46 +1,92 @@
 [
- ;; Couldn't figure out how to reuse txn-fns in other txn-fns.
- ;;
- ;; I don't need position anymore since I can just sort by uid.
- ;; uids are always in order unless I decide to start to fill in for holes in
- ;; deleted uids.
- ;;
- ;; {:db/id #db/id[:db.part/user]
- ;;  :db/ident :bumpPosition
- ;;  :db/doc "Atomically adds to the end of a list of sorted cardinality/many lists"
- ;;  :db/fn #db/fn {:lang "clojure"
- ;;                 ;; [forum-eid :forum/topics topic-eid :topic/position]
- ;;                 ;; [topic-eid :topic/posts  post-eid  :post/position]
- ;;                 :requires [[datomic.api]]
- ;;                 :params [db scope-id scope-attr new-id pos-attr]
- ;;                 :code (let [children (scope-attr (datomic.api/entity db scope-id))
- ;;                             highest-pos (reduce max 0 (map pos-attr children))]
- ;;                         [[:db/add new-id pos-attr (inc highest-pos)]])}}
-
- ;; uid incrementers
- ;;
- ;; - uid is the public ID of entities. 
- ;; - I manually increment uid to replicate autoincrement
- ;;   behavior I'm used to in other databases.
- ;; - I can't use :db/id for the public ID (like in
- ;;   a URL /forums/:id) because :db/id is Datomic's internal ID
- ;;   and it will be regenerated whenever, say, I have to
- ;;   import data from a backup. Leaning on :db/id would invalidate
- ;;   all existing URLs.
- ;; - uids are incremented only in the scope of other topics,
- ;;   posts, forums, etc.
-
  {:db/id #db/id[:db.part/user]
   :db/ident :addUID
-  :db/fn #db/fn {:lang "clojure"
-                 :params [db new-eid attr]
-                 :code (let [res (datomic.api/q
-                                  '[:find (max ?uid)
-                                    :in $ ?attr
-                                    :where [_ ?attr ?uid]]
-                                  db
-                                  attr)
-                             new-uid (inc (or (ffirst res) 0))]
-                         [[:db/add new-eid attr new-uid]])}}
+  :db/fn #db/fn
+  {:lang :clojure
+   :params [db new-eid attr]
+   :code (let [res (datomic.api/q
+                    '[:find (max ?uid)
+                      :in $ ?attr
+                      :where [_ ?attr ?uid]]
+                    db
+                    attr)
+               new-uid (inc (or (ffirst res) 0))]
+           [[:db/add new-eid attr new-uid]])}}
 
- ]
+ ;; User constructor
+ {:db/id #db/id[:db.part/user]
+  :db/ident :user/construct
+  :db/fn #db/fn
+  {:lang :clojure
+   :params [db eid uname digest]
+   :code
+   (when-not
+       (seq (d/q '[:find ?u
+                   :in $ ?uname
+                   :where [?u :user/uname ?uname]]
+                 db uname))
+     (into
+      [{:db/id eid
+        :user/uname uname
+        :user/digest digest
+        :user/created (java.util.Date.)}]
+      (datomic.api/invoke db :addUID db eid :user/uid)))}}
+
+ ;; Forum constructor
+ {:db/id #db/id[:db.part/user]
+  :db/ident :forum/construct
+  :db/fn #db/fn
+  {:lang :clojure
+   :params [db eid title desc]
+   :code
+   [{:db/id eid
+     :forum/title title
+     :forum/desc desc}
+    [:addUID eid :forum/uid]]}}
+
+ ;; Post constructor
+ {:db/id #db/id[:db.part/user]
+  :db/ident :post/construct
+  :db/fn #db/fn
+  {:lang :clojure
+   :params [db tuid text]
+   :require [datomic.api :as d]
+   :code
+   (let [peid (d/tempid :db.part/user)]
+     [;; Make post
+      {:db/id peid
+       :post/text text
+       :post/created (java.util.Date.)}
+      [:addUID peid :post/uid]
+      ;; Append post to :topic/posts
+      {:db/id (d/tempid :db.part/user)
+       :topic/uid tuid
+       :topic/posts peid}])}}
+ 
+ ;; Topic constructor
+ {:db/id #db/id[:db.part/user]
+  :db/ident :topic/construct
+  :db/fn #db/fn
+  {:lang :clojure
+   :params [db fuid title text]
+   :code
+   (let [teid (d/tempid :db.part/user)
+         peid (d/tempid :db.part/user)
+         created (java.util.Date.)]
+     [;; Make topic
+      {:db/id teid
+       :topic/title title
+       :topic/created created}
+      [:addUID teid :topic/uid]
+      ;; Make post
+      {:db/id peid
+       :post/text text
+       :post/created created}
+      [:addUID peid :post/uid]
+      ;; Append post to :topic/posts
+      [:db/add teid :topic/posts peid]
+      ;; Append topic to :forum/topics
+      {:db/id (d/tempid :db.part/user)
+       :forum/uid fuid
+       :forum/topics teid}])}}
+]

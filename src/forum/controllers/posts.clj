@@ -5,8 +5,8 @@
 ;; post: {:text ""}
 (defn create [fuid tuid post-params]
   ;; TODO: Add post validation
-  (when-let [forum (forum.db/get-forum fuid)]
-    (when-let [topic (forum.db/get-topic tuid)]
+  (when-let [forum (forum.db/find-forum-by-uid fuid)]
+    (when-let [topic (forum.db/find-topic-by-uid tuid)]
       (if-let [puid (forum.db/create-post tuid (:text post-params))]
         (redirect (str "/forums/" fuid "/topics/" tuid))
         "Error creating post. ^_^"))))

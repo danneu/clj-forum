@@ -8,5 +8,5 @@
   (fn [request]
     (let [session (:session request)]
       (binding [current-user (when-let [uid (:user/uid session)]
-                               (db/get-user-by-uid uid))]
+                               (db/find-user-by-uid uid))]
         (handler request)))))

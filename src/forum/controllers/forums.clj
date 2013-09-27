@@ -4,7 +4,7 @@
             [forum.views.master :refer :all]))
 
 (defn index []
-  (let [forums (forum.db/get-all-forums)]
+  (let [forums (forum.db/find-all-forums)]
     (layout (forum.views.forums/index forums))))
 
 (defn show [fuid]

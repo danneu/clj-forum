@@ -40,7 +40,6 @@ resource that can be opened by io/reader."
     (create-db)))
 
 (def conn (d/connect uri))
-;; (def conn (create-db))
 
 (defn tempid []
   (d/tempid :db.part/user))
@@ -103,11 +102,17 @@ resource that can be opened by io/reader."
 (defn find-all-forums []
   (flatten (find-all-by (d/db conn) :forum/uid)))
 
-(defn find-forum-by-uid [uid]
-  (find-by (d/db conn) :forum/uid uid))
-
 (defn find-all-users []
   (flatten (find-all-by (d/db conn) :user/uid)))
+
+(defn find-all-topics []
+  (flatten (find-all-by (d/db conn) :topic/uid)))
+
+(defn find-all-posts []
+  (flatten (find-all-by (d/db conn) :post/uid)))
+
+(defn find-forum-by-uid [uid]
+  (find-by (d/db conn) :forum/uid uid))
 
 (defn find-user-by-uid [uid]
   (find-by (d/db conn) :user/uid uid))
@@ -118,74 +123,57 @@ resource that can be opened by io/reader."
 (defn find-topic-by-uid [uid]
   (find-by (d/db conn) :topic/uid uid))
 
-;; User ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn create-user [uname pwd]
+;; TODO: This is roundabout. Can I think of something better?
+(defn- created-entity
+  "Returns the entity created from a transaction (or nil)
+   where `tx-result` is the result of a d/transact call.
+   `attr` and `val` are used to look through the created Datoms.
+   Ex: (created-entity res :user/uname \"danneu\")"
+  [tx-result attr val]
+  (d/entity (:db-after tx-result)
+            (:e (first (filter #(= val (:v %))
+                               (:tx-data tx-result))))))
+
+(defn create-user
+  "Returns uid or nil."
+  [uname pwd]
   (let [digest (forum.authentication/encrypt pwd)
-        ueid (tempid)
-        res @(d/transact conn
-                         [{:db/id ueid
-                           :user/uname uname
-                           :user/digest digest
-                           :user/created (Date.)}
-                          [:addUID ueid :user/uid]])]
+        eid (tempid)
+        result @(d/transact
+                 conn [[:user/construct eid uname digest]])]
+    (:user/uid (created-entity result :user/uname uname))))
 
-
-      (:user/uid (entity (:e (first (filter #(= uname (:v %))
-                                            (:tx-data res))))))))
-
+(defn create-user
+  "Returns uid or nil."
+  [uname pwd]
+  (let [digest (forum.authentication/encrypt pwd)
+        eid (tempid)
+        result @(d/transact
+                 conn [[:user/construct eid uname digest]])]
+    (:user/uid (created-entity result :user/uname uname))))
 
 (defn create-forum
-  "Returns uid of created forum."
+  "Returns uid or nil."
   [title desc]
-  (let [feid (tempid)
-        tx-result @(d/transact conn
-                               [{:db/id feid
-                                 :forum/title title
-                                 :forum/desc desc}
-                                [:addUID feid :forum/uid]])]
-    (:forum/uid (entity (:e (last (:tx-data tx-result)))))))
+  (let [eid (tempid)
+        result @(d/transact
+                 conn [[:forum/construct eid title desc]])]
+    (:forum/uid (created-entity result :forum/title title))))
 
 (defn create-topic
-  "Returns uid of created topic."
+  "Returns uid or nil"
   [fuid title text]
-  (let [teid (tempid)
-        peid (tempid)
-        now (Date.)]
-    (let [tx-result
-          @(d/transact conn
-                       [;; Make topic
-                        {:db/id teid
-                         :topic/title title
-                         :topic/created now}
-                        [:addUID teid :topic/uid]
-
-                        ;; Add topic to forum
-                        {:forum/uid fuid :forum/topics teid :db/id (tempid)}
-
-                        ;; Make post
-                        {:db/id peid
-                         :post/text text
-                         :post/created now}
-                        [:addUID peid :post/uid]
-                        {:db/id teid :topic/posts peid}])]
-      ;; Get uid of the topic created
-      (:topic/uid (entity (:e (first (filter #(= title (:v %)) (:tx-data tx-result)))))))))
+  (let [result @(d/transact conn
+                            [[:topic/construct fuid title text]])]
+    (:topic/uid (created-entity result :topic/title title))))
 
 (defn create-post
-  "Returns uid of created post."
+  "Return uid or nil"
   [tuid text]
-  (let [peid (tempid)]
-    (let [tx-result @(d/transact conn
-                                 ;; Create post
-                                 [{:db/id peid
-                                   :post/text text
-                                   :post/created (Date.)}
-                                  [:addUID peid :post/uid]
-                                  ;; Add post to topic with this tuid
-                                  {:topic/uid tuid :topic/posts peid :db/id (tempid)}])]
-      ;; Get uid of the post created
-      (:post/uid (entity (:e (first (filter #(= text (:v %)) (:tx-data tx-result)))))))))
+  (let [result @(d/transact conn [[:post/construct tuid text]])]
+    (:post/uid (created-entity result :post/text text))))
 
 ;; Seed the DB ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -231,33 +219,16 @@ resource that can be opened by io/reader."
           (take 3 (repeatedly generate-sentence))))))
     conn))
 
-(defn get-all-topics []
-  (let [res (d/q '[:find ?t
-                   :where [?t :topic/title]]
-                 (d/db conn))]
-    (map (comp entity first) res)))
-
-(defn get-all-posts []
-  (let [res (d/q '[:find ?t
-                   :where [?t :post/text]]
-                 (d/db conn))]
-    (map (comp entity first) res)))
-
 ;; Seed check ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;; (let [wipe? false]
-;;   (when (or (> 1 (count (get-all-posts)))
-;;             wipe?)
-;;     ;; Can I think of a better solution than redef?
-;;     (def conn (create-db))
-;;     (seed-db conn 5 5)))
 
 (defn seed
   "To be run from cli: lein run -m forum.db/seed"
   []
   (def conn (create-db))
   (seed-db conn 5 5)
-  (let [posts (get-all-posts)]
+  (let [posts (find-all-posts)]
     (prn {:post-count (count posts)
-          :latest-post ((comp :post/created first) (sort-by :post/uid #(> %1 %2) (get-all-posts)))})
+          :latest-post ((comp :post/created first) (sort-by :post/uid #(> %1 %2) (find-all-posts)))})
     :done))
+
+

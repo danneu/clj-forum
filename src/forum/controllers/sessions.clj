@@ -10,7 +10,7 @@
 ;; Actions
 
 (defn create [uname pwd]
-  (if-let [user (db/get-user-by-uname uname)]
+  (if-let [user (db/find-user-by-uname uname)]
     (if (match? pwd (:user/digest user))
       (-> (redirect "/")
           (assoc :session (select-keys user [:user/uid]))

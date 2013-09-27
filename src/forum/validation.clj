@@ -52,7 +52,7 @@
          (when (< 30 (count pwd))
            "Password must be no longer than 30 chars"))
        (fn [{uname :uname}]
-         (when (db/get-user-by-uname
+         (when (db/find-user-by-uname
                 uname)
            "Username is taken"))])
      u)))
