@@ -1,13 +1,8 @@
 (ns forum.helpers
+  (:use [hiccup core page form element util])
   (:import [org.ocpsoft.prettytime PrettyTime]))
 
 ;; AKA orphaned functions
-
-;; For Datoms/Entites
-;;
-;; Felt wrong to put this stuff in forum.db since it
-;; only deals with entities, but I also never liked the
-;; junk-drawer helpers of Rails.
 
 (defn parent-forum
   "Given topic entity, returns parent forum entity."
@@ -17,11 +12,11 @@
 (defn url-for
   "Here's my URL abstraction. Just pass in entity."
   [e]
-  (let [eid (:db/id e)]
-    (cond
-     (:forum/uid e) (str "/forums/" (:forum/uid e))
-     (:topic/uid e) (str (url-for (parent-forum e))
-                         "/topics/" (:topic/uid e)))))
+  (cond
+   (:user/uid e) (url "/users/" (:user/uid e))
+   (:forum/uid e) (str "/forums/" (:forum/uid e))
+   (:topic/uid e) (str (url-for (parent-forum e))
+                       "/topics/" (:topic/uid e))))
 
 (defn latest-topic
   "Given a forum entity, returns latest topic

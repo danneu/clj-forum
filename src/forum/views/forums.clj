@@ -37,12 +37,13 @@
    
    ;; List the topics in this forum
    [:table.table
-    (for [topic topics]
+    (for [topic topics
+          :let [[user] (:user/_topics topic)]]
       [:tr
        [:td
         (link-to (url-for topic)
                  (:topic/title topic)) [:br]
-        "by " (link-to "/" "Username")]
+        "by " (link-to (url-for user) (:user/uname user))]
        [:td (count (:topic/posts topic)) " posts"]
        [:td (pretty-date (:topic/created topic))]])]
 

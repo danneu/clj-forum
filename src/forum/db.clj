@@ -158,15 +158,18 @@ resource that can be opened by io/reader."
 
 (defn create-topic
   "Returns uid or nil"
-  [fuid title text]
+  [user-uid fuid title text]
   (let [result @(d/transact conn
-                            [[:topic/construct fuid title text]])]
+                            [[:topic/construct
+                              user-uid fuid title text]])]
     (:topic/uid (created-entity result :topic/title title))))
 
 (defn create-post
   "Return uid or nil"
-  [tuid text]
-  (let [result @(d/transact conn [[:post/construct tuid text]])]
+  [user-uid tuid text]
+  (let [result @(d/transact
+                 conn
+                 [[:post/construct user-uid tuid text]])]
     (:post/uid (created-entity result :post/text text))))
 
 ;; Seed the DB ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -189,7 +192,8 @@ resource that can be opened by io/reader."
         (str _ ".")))
 
 (defn seed-db [conn topics-per-forum posts-per-topic]
-  (let [forums (for [[title desc]
+  (let [danneu-uid (create-user "danneu" "catdog")
+        forums (for [[title desc]
                      [["Newbie Introductions"
                        "Are you new here? Then introduce yourself!"]
                       ["General Discussion"
@@ -201,12 +205,14 @@ resource that can be opened by io/reader."
                 (repeatedly
                  topics-per-forum
                  #(for [forum forums]
-                    (create-topic forum
+                    (create-topic danneu-uid
+                                  forum
                                   (generate-sentence)
                                   (generate-sentence)))))]
     (doseq [topic topics]
       (dotimes [_ posts-per-topic]
         (create-post
+         danneu-uid
          topic
          (clojure.string/join
           " "
@@ -224,5 +230,3 @@ resource that can be opened by io/reader."
     (prn {:post-count (count posts)
           :latest-post ((comp :post/created first) (sort-by :post/uid #(> %1 %2) (find-all-posts)))})
     :done))
-
-

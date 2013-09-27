@@ -10,11 +10,12 @@
 
    ;; List posts
    [:ul.list-group
-    (for [p posts]
+    (for [p posts
+          :let [[user] (:user/_posts p)]]
       [:li.list-group-item
         [:div.row
          [:div.col-lg-2
-          (link-to "/" "Username") [:br]
+          (link-to (url-for user) (:user/uname user)) [:br]
           (pretty-date (:post/created p))]
          [:div.col-lg-10 (:post/text p)]]])]
 

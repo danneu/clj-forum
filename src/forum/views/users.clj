@@ -13,7 +13,11 @@
 
 (defn show [user]
   (html
-   [:h2 (:user/uname user)]))
+   [:h2 (:user/uname user)]
+   [:ul
+    [:li "Topics: " (count (:user/topics user))]
+    [:li "Posts: " (count (:user/posts user))]]))
+
 
 (defn new []
   (html

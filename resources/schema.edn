@@ -95,7 +95,7 @@
   :db/valueType :db.type/string        
   :db/cardinality :db.cardinality/one
   :db.install/_attribute :db.part/db}
- ;; :user/p one string
+ ;; :user/digest one string
  {:db/id #db/id[:db.part/db]
   :db/ident :user/digest
   :db/doc "A user's hashed password."
@@ -116,5 +116,19 @@
   :db/doc "A user's public ID."
   :db/valueType :db.type/long
   :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
+ ;; :user/topics many ref
+ {:db/id #db/id[:db.part/db]   
+  :db/ident :user/topics
+  :db/doc "A user's topics."
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/many
+  :db.install/_attribute :db.part/db}
+ ;; :user/posts many ref
+ {:db/id #db/id[:db.part/db]   
+  :db/ident :user/posts
+  :db/doc "A user's posts."
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/many
   :db.install/_attribute :db.part/db}
  ]

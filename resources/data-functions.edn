@@ -49,7 +49,7 @@
   :db/ident :post/construct
   :db/fn #db/fn
   {:lang :clojure
-   :params [db tuid text]
+   :params [db user-uid tuid text]
    :require [datomic.api :as d]
    :code
    (let [peid (d/tempid :db.part/user)]
@@ -61,14 +61,19 @@
       ;; Append post to :topic/posts
       {:db/id (d/tempid :db.part/user)
        :topic/uid tuid
-       :topic/posts peid}])}}
+       :topic/posts peid}
+      ;; Append post to :user/posts
+      {:db/id (d/tempid :db.part/user)
+       :user/uid user-uid
+       :user/posts peid}
+      ])}}
  
  ;; Topic constructor
  {:db/id #db/id[:db.part/user]
   :db/ident :topic/construct
   :db/fn #db/fn
   {:lang :clojure
-   :params [db fuid title text]
+   :params [db user-uid fuid title text]
    :code
    (let [teid (d/tempid :db.part/user)
          peid (d/tempid :db.part/user)
@@ -88,5 +93,12 @@
       ;; Append topic to :forum/topics
       {:db/id (d/tempid :db.part/user)
        :forum/uid fuid
-       :forum/topics teid}])}}
+       :forum/topics teid}
+      ;; Append topic and post to :user/topics :user/posts
+      {:db/id (d/tempid :db.part/user)
+       :user/uid user-uid
+       :user/topics teid}
+      {:db/id (d/tempid :db.part/user)
+       :user/uid user-uid
+       :user/posts peid}])}}
 ]
