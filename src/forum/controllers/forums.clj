@@ -8,9 +8,8 @@
     (layout (forum.views.forums/index forums))))
 
 (defn show [fuid]
-  (when-let [forum (forum.db/get-forum fuid)]
+  (when-let [forum (forum.db/find-forum-by-uid fuid)]
     (let [topics (:forum/topics forum)]
-      (clojure.pprint/pprint topics)
       (layout
        {:crumbs []}
        (forum.views.forums/show forum

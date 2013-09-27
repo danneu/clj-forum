@@ -51,33 +51,74 @@ resource that can be opened by io/reader."
 (defn entity [e]
   (d/entity (d/db conn) e))
 
-;; GET functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Should return entities
+(defn only
+  "Returns the only item from a query result"
+  [query-result]
+  (ffirst query-result))
 
-(defn get-all-forums
-  "Returns entities"
-  []
-  (let [res (q '[:find ?f
-                 :where [?f :forum/title]])]
-    (map (comp entity first) res)))
+(defn qe
+  "Returns the single entity returned from a query"
+  [query db & args]
+  (let [result (apply d/q query db args)]
+    (d/entity db (only result))))
 
-(defn get-forum
-  "Returns entity or nil"
-  [fuid]
-  (let [res (d/q '[:find ?f
-                   :in $ ?fuid
-                   :where [?f :forum/uid ?fuid]]
-                 (d/db conn)
-                 fuid)]
-    (entity (ffirst res))))
+(defn find-by
+  "Returns the unique entity identified by attr and val.
+   Ex: (find-by :user/uid 42)"
+  [db attr val]
+  (qe '[:find ?e
+        :in $ ?attr ?val
+        :where [?e ?attr ?val]]
+      db attr val))
+
+(defn qes
+  "Returns the entities returned by a query, assuming that
+   all :find results are entity ids."
+  [query db & args]
+  (->> (apply d/q query db args)
+       (mapv (fn [items]
+               (mapv (partial d/entity db) items)))))
+
+(defn find-all-by
+  "Returns all entities possessing attr."
+  [db attr]
+  (qes '[:find ?e
+         :in $ ?attr
+         :where [?e ?attr]]
+       db attr))
+
+(defn qfs
+  "Returns the first of each query result"
+  [query db & args]
+  (->> (apply d/q query db args)
+       (mapv first)))
+
+;; Finders - Return one or many entities ;;;;;;;;;;;;;;;;;;;;
+;;
+;; Forms:
+;; 
+;; - find-all-X []
+;; - find-X-by-Y [y]
+
+(defn find-all-forums []
+  (flatten (find-all-by (d/db conn) :forum/uid)))
+
+(defn find-forum-by-uid [uid]
+  (find-by (d/db conn) :forum/uid uid))
+
+(defn find-all-users []
+  (flatten (find-all-by (d/db conn) :user/uid)))
+
+(defn find-user-by-uid [uid]
+  (find-by (d/db conn) :user/uid uid))
+
+(defn find-user-by-uname [uname]
+  (find-by (d/db conn) :user/uname uname))
+
+(defn find-topic-by-uid [uid]
+  (find-by (d/db conn) :topic/uid uid))
 
 ;; User ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn get-all-users []
-  (let [res (d/q '[:find ?u
-                   :where [?u :user/uid]]
-                 (d/db conn))]
-    (map (comp entity first) res)))
 
 (defn create-user [uname pwd]
   (let [digest (forum.authentication/encrypt pwd)
@@ -93,24 +134,6 @@ resource that can be opened by io/reader."
       (:user/uid (entity (:e (first (filter #(= uname (:v %))
                                             (:tx-data res))))))))
 
-(defn get-user-by-uname [uname]
-  (let [res (d/q '[:find ?u
-                   :in $ ?uname
-                   :where [?u :user/uname ?uname]]
-                 (d/db conn)
-                 uname)]
-    (entity (ffirst res))))
-
-(defn get-user-by-uid [uid]
-  (let [res (d/q '[:find ?u
-                   :in $ ?uid
-                   :where [?u :user/uid ?uid]]
-                 (d/db conn)
-                 uid)]
-    (entity (ffirst res))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Creation functions should return uids
 
 (defn create-forum
   "Returns uid of created forum."
@@ -148,16 +171,6 @@ resource that can be opened by io/reader."
                         {:db/id teid :topic/posts peid}])]
       ;; Get uid of the topic created
       (:topic/uid (entity (:e (first (filter #(= title (:v %)) (:tx-data tx-result)))))))))
-
-(defn get-topic
-  "Returns entity or nil"
-  [tuid]
-  (let [res (d/q '[:find ?t
-                   :in $ ?tuid
-                   :where [?t :topic/uid ?tuid]]
-                 (d/db conn)
-                 tuid)]
-    (entity (ffirst res))))
 
 (defn create-post
   "Returns uid of created post."

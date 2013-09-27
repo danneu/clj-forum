@@ -6,8 +6,8 @@
             [ring.util.response :refer [redirect]]))
 
 (defn show [fuid tuid]
-  (when-let [forum (forum.db/get-forum fuid)]
-    (when-let [topic (forum.db/get-topic tuid)]
+  (when-let [forum (forum.db/find-forum-by-uid fuid)]
+    (when-let [topic (forum.db/find-topic-by-uid tuid)]
       (let [posts (:topic/posts topic)]
         ;; TODO: Put the sort-by in forum.db layer or something.
         ;; TODO: Create a url generator from resources.
@@ -20,9 +20,9 @@
                                   (sort-by :post/uid < posts)))))))
 
 (defn create [fuid topic]
-  (when-let [forum (forum.db/get-forum fuid)]
+  (when-let [forum (forum.db/find-forum-by-uid fuid)]
     (if-let [tuid (forum.db/create-topic fuid
-                                            (:title topic)
-                                            (:text (:post topic)))]
+                                         (:title topic)
+                                         (:text (:post topic)))]
       (redirect (str "/forums/" fuid "/topics/" tuid))
       "Error creating thread. ^_^")))

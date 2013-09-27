@@ -6,7 +6,7 @@
             [ring.util.response :refer [redirect]]))
 
 (defn index []
-  (let [users (db/get-all-users)]
+  (let [users (db/find-all-users)]
     (layout (forum.views.users/index
              (sort-by :user/uid > users)))))
 
