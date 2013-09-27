@@ -65,7 +65,7 @@
                                   "Log in"))
 
             [:p.navbar-text.pull-right
-             (link-to {:class "navbar-link"} "/" "Register")
+             (link-to {:class "navbar-link"} "/users/new" "Register")
              " or"]
 
                  ))  ; /if current-user
