@@ -230,3 +230,13 @@ resource that can be opened by io/reader."
     (prn {:post-count (count posts)
           :latest-post ((comp :post/created first) (sort-by :post/uid #(> %1 %2) (find-all-posts)))})
     :done))
+
+
+(defn forum-posts-count [feid]
+  (let [result (d/q '[:find (count ?p)
+                      :in $ ?f
+                      :where [?f :forum/topics ?t]
+                      [?t :topic/posts ?p]]
+                    (d/db conn) feid)]
+    (only result)))
+

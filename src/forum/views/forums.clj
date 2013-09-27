@@ -26,26 +26,41 @@
          [:p.list-group-item-text (:forum/desc forum)]]
         [:div.col-lg-4.forum-meta
          (str (count (:forum/topics forum)) " topics") [:br]
-         (str (pretty-date (:topic/created (latest-topic forum))))
+         (:posts-count forum) " posts"
          ]
         ]])
     ]))
 
 (defn show [forum topics]
   (html
-   [:h2 (:forum/title forum)]
+
+
+   [:style ".topics .topic { padding: 5px 0; }"]
    
-   ;; List the topics in this forum
-   [:table.table
+   [:h2 (:forum/title forum)]
+
+   [:div.list-group.topics
     (for [topic topics
-          :let [[user] (:user/_topics topic)]]
-      [:tr
-       [:td
-        (link-to (url-for topic)
-                 (:topic/title topic)) [:br]
-        "by " (link-to (url-for user) (:user/uname user))]
-       [:td (count (:topic/posts topic)) " posts"]
-       [:td (pretty-date (:topic/created topic))]])]
+          :let [[user] (:user/_topics topic)
+                latest-post (latest-post topic)
+                latest-creator (creator latest-post)]]
+      [:div.list-group-item.clearfix.topic
+       ;; Topic info
+       [:div.col-sm-9
+        [:div.topic-title
+         (link-to (url-for topic) (:topic/title topic))]
+        [:div.topic-creator
+         "by " (link-to (url-for user) (:user/uname user))
+         ", "
+         (pretty-date (:topic/created topic))]]
+       ;; Latest post
+       [:div.col-sm-3
+        [:div
+         (link-to "/" "Latest post")
+         " by "
+         (link-to (url-for latest-creator)
+                  (:user/uname latest-creator))]
+        (pretty-date (:topic/created topic))]])]
 
    ;; New topic form
    [:h3 "New Topic"]

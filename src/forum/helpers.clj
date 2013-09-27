@@ -33,6 +33,24 @@
                   #(- ( .compareTo %1 %2))
                   (:forum/topics forum))))
 
+(defn latest-post
+  [topic]
+  (last (sort-by :post/uid (:topic/posts topic))))
+
+(defn entity-type
+  [entity]
+  (cond
+   (:topic/uid entity) :topic
+   (:post/uid entity) :post
+   (:forum/uid entity) :forum
+   (:user/uid entity) :user))
+
+(defn creator
+  [topic-or-post]
+  (case (entity-type topic-or-post)
+   :topic (first (:user/_topics topic-or-post))
+   :post (first (:user/_posts topic-or-post))))
+
 (defn pretty-date
   "Turn Date into string of 'about 10 minutes ago'."
   [date]
