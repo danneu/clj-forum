@@ -45,13 +45,12 @@
                                         post))))
   (GET "/users" []
     (forum.controllers.users/index))
-  (GET "/users/:uid" [uid]
-    (println "LOL")
-    (forum.controllers.users/show (Long. uid)))
   (GET "/users/new" []
     (forum.controllers.users/new))
   (POST "/users/create" [user]
     (forum.controllers.users/create user))
+  (GET "/users/:uid" [uid]
+    (forum.controllers.users/show (Long. uid)))
   (POST "/sessions/create" [uname pwd]
     (forum.controllers.sessions/create uname pwd))
   (GET "/logout" []
