@@ -3,6 +3,8 @@
   (:require [forum.db]
             [forum.views.topics]
             [forum.views.master :refer :all]
+            [forum.middleware.wrap-current-user
+             :refer [current-user]]
             [ring.util.response :refer [redirect]]))
 
 (defn show [fuid tuid]
@@ -21,8 +23,10 @@
 
 (defn create [fuid topic]
   (when-let [forum (forum.db/find-forum-by-uid fuid)]
-    (if-let [tuid (forum.db/create-topic fuid
-                                         (:title topic)
-                                         (:text (:post topic)))]
+    (if-let [tuid (forum.db/create-topic
+                   (:user/uid current-user)
+                   fuid
+                   (:title topic)
+                   (:text (:post topic)))]
       (redirect (str "/forums/" fuid "/topics/" tuid))
       "Error creating thread. ^_^")))
