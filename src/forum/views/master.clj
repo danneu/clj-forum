@@ -61,7 +61,7 @@
                     (password-field {:class "form-control input-sm"
                                      :placeholder "Password"}
                                     "pwd")]
-                   (submit-button {:class "btn btn-info btn-sm"}
+                   (submit-button {:class "btn btn-primary btn-sm"}
                                   "Log in"))
 
             [:p.navbar-text.pull-right
