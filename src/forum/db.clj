@@ -73,6 +73,12 @@ resource that can be opened by io/reader."
 
 ;; User ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn get-all-users []
+  (let [res (d/q '[:find ?u
+                   :where [?u :user/uid]]
+                 (d/db conn))]
+    (map (comp entity first) res)))
+
 (defn create-user [uname pwd]
   (let [digest (forum.authentication/encrypt pwd)
         ueid (tempid)
@@ -82,7 +88,10 @@ resource that can be opened by io/reader."
                            :user/digest digest
                            :user/created (Date.)}
                           [:addUID ueid :user/uid]])]
-    res))
+
+
+      (:user/uid (entity (:e (first (filter #(= uname (:v %))
+                                            (:tx-data res))))))))
 
 (defn get-user-by-uname [uname]
   (let [res (d/q '[:find ?u
@@ -222,17 +231,20 @@ resource that can be opened by io/reader."
     (map (comp entity first) res)))
 
 ;; Seed check ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; (let [wipe? false]
+;;   (when (or (> 1 (count (get-all-posts)))
+;;             wipe?)
+;;     ;; Can I think of a better solution than redef?
+;;     (def conn (create-db))
+;;     (seed-db conn 5 5)))
 
-(let [wipe? false]
-  (when (or (> 1 (count (get-all-posts)))
-            wipe?)
-    ;; Can I think of a better solution than redef?
-    (def conn (create-db))
-    (seed-db conn 5 5)))
-
-;; Show total post count on file eval (sanity check)
-
-(let [posts (get-all-posts)]
-  {:post-count (count posts)
-   :latest-post ((comp :post/created first) (sort-by :post/uid #(> %1 %2) (get-all-posts)))
-})
+(defn seed
+  "To be run from cli: lein run -m forum.db/seed"
+  []
+  (def conn (create-db))
+  (seed-db conn 5 5)
+  (let [posts (get-all-posts)]
+    (prn {:post-count (count posts)
+          :latest-post ((comp :post/created first) (sort-by :post/uid #(> %1 %2) (get-all-posts)))})
+    :done))

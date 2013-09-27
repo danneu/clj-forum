@@ -1,6 +1,7 @@
 (ns forum.views.master
   (:use [hiccup core element page util])
-  (:require [forum.middleware.expose-request :refer [req]])
+  (:require [forum.middleware.expose-request :refer [req]]
+            [forum.middleware.wrap-current-user :refer [current-user]])
   (:import [java.io StringWriter]))
 
 (defn render-crumbs [crumbs]
@@ -9,6 +10,13 @@
      [:li (link-to "/" "Home")]
      (for [c crumbs]
        [:li c])]))
+
+(defn render-flashes []
+  (when-let [flashes (:flash req)]
+    (html
+     (for [flash flashes  ; Ex: [[:danger "Uh oh!"]]
+           :let [[type message] flash]]
+       [:div.alert {:class (str "alert-" (name type))} message]))))
 
 (defn layout
   "The layout wraps individuals views.
@@ -27,11 +35,41 @@
        
        [:div.container
         [:div.header
-         [:ul.nav.nav-pills.pull-right
-          [:li (link-to "/" "Home")]
-          [:li (link-to "/" "About")]
-          [:li (link-to "/" "Contact")]]
+         ;; [:ul.nav.nav-pills.pull-right
+         ;;  [:li (link-to "/" "Home")]
+         ;;  [:li (link-to "/users" "Users")]]
+         (if current-user
+           ;; If logged in
+           (list [:ul.nav.navbar-nav.pull-right
+                  [:li (link-to "/logout" "logout")]]
+                 [:div.pull-right
+                  [:p.navbar-text
+                   "Logged in as "
+                   (link-to (url "/users/" (:user/uid current-user))
+                            (:user/uname current-user))]])
+           ;; If logged out
+           (list
+            [:a.pull-right.btn.btn-default.navbar-btn
+             {:href "/"}
+             "Register"]
+            (form-to
+                   {:class "navbar-form navbar-right"}
+                   [:post "/sessions/new"]
+                   [:div.form-group
+                    (text-field {:class "form-control"
+                                 :placeholder "Username"}
+                                "user[uname]")]
+                   [:div.form-group
+                    (password-field {:class "form-control"
+                                     :placeholder "Password"}
+                                    "user[pwd]")]
+                   (submit-button {:class "btn btn-default"}
+                                  "Log in"))
+                 ))
+         
          [:h3 (link-to "/" "clj-forum")]]
+
+        (render-flashes)
 
         (render-crumbs (:crumbs opts))
 

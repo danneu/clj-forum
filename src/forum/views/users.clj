@@ -1,6 +1,16 @@
 (ns forum.views.users
   (:use [hiccup core element form page util]))
 
+(defn index [users]
+  (html
+   [:h2 (count users) " Users"]
+   [:table.table
+    (for [user users]
+      [:tr
+       [:td (:user/uname user)]
+       [:td (:user/uid user)]
+       [:td (:user/digest user)]])]))
+
 (defn new [flash]
   (html
    [:div.row

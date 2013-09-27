@@ -9,8 +9,13 @@
             [forum.controllers.posts]
             [forum.controllers.topics]
             [forum.controllers.users]
-            [forum.middleware.expose-request :refer [expose-request]]
-            [ring.middleware.session.cookie :refer [cookie-store]]))
+            [forum.middleware.expose-request
+             :refer [expose-request]]
+            [forum.middleware.wrap-current-user
+             :refer [current-user wrap-current-user]]
+            [ring.middleware.session.cookie
+             :refer [cookie-store]]
+            [ring.util.response :refer [redirect]]))
 
 ;; - The Router should do preliminary checking on params.
 ;;   I've decided to cast params to Longs in the Router instead
@@ -37,25 +42,36 @@
         (forum.controllers.posts/create (Long. fuid)
                                         (Long. tuid)
                                         post))))
+  (GET "/users" []
+    (forum.controllers.users/index))
   (GET "/users/new" [_ :as req]
     (let [flash (:flash req)]
       (forum.controllers.users/new flash)))
   (POST "/users/create" [user]
     (forum.controllers.users/create user))
+  (GET "/logout" []
+    (-> (redirect "/")
+        (assoc :session nil)
+        (assoc :flash [{:success "You were logged out."}])))
   (route/resources "/")
   (route/not-found "Not Found"))
+
+;; Config
 
 (def config
   ;; {:session-secret String}
   (read-string (slurp (io/resource "config.edn"))))
 
+;; Store session in cookie that's encrypted
+;; with AES key defined as :session-secret config.edn.
+(def session-opts
+  {:store (cookie-store {:key (:session-secret config)})})
+
 (def app
-  (handler/site (expose-request app-routes)
-                ;; Store session in cookie that's encrypted
-                ;; with AES key defined as :session-secret config.edn.
-                {:session
-                 {:store (cookie-store
-                          {:key (:session-secret config)})}}))
+  (-> app-routes
+      expose-request
+      wrap-current-user
+      (handler/site {:session session-opts})))
 
 ;; Server
 

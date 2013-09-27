@@ -5,13 +5,21 @@
             [forum.validation :refer [validate-user-params]]
             [ring.util.response :refer [redirect]]))
 
+(defn index []
+  (let [users (db/get-all-users)]
+    (layout (forum.views.users/index
+             (sort-by :user/uid > users)))))
+
 (defn new [flash]
   (layout (forum.views.users/new flash)))
 
 (defn create [user-params]
   (if-let [error (validate-user-params user-params)]
     (assoc (redirect "/users/new") :flash {:danger error})
-    (do (db/create-user (:uname user-params)
-                        (:pwd user-params))
-        (pr-str (db/get-user-by-uname (:uname user-params))))))
+    (let [useruid (db/create-user (:uname user-params)
+                               (:pwd user-params))]
+        (assoc-in (redirect "/users")
+                  [:session :user/uid]
+                  useruid)))
 
+)
