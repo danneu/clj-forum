@@ -102,9 +102,12 @@
 
         ;; Debug bar
         [:style "body { padding-bottom: 70px; }"]  ; 20px default + 50px debug bar height
-        [:nav#debug-bar.navbar.navbar-inverse.navbar-fixed-bottom
+        [:style ".debug-bar { min-height: 30px; }"]
+        [:style ".debug-bar .navbar-brand { padding: 5px; }
+                 .debug-bar .btn { padding: 0 5px; margin: 5px; }"]
+        [:nav.debug-bar.navbar.navbar-inverse.navbar-fixed-bottom
          [:div.navbar-header [:a.navbar-brand "Debug"]]
-         [:button#toggle-request-map.btn.btn-default.navbar-btn {:type "button"} "Toggle request-map"]]
+         [:button#toggle-request-map.btn.btn-default.navbar-btn.btn-sm {:type "button"} "Toggle request-map"]]
 
         ] ;/container
 
