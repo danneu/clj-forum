@@ -70,7 +70,7 @@ Topic
 - :topic/uid
 - :topic/created
 
-The OP's post in a topic is simply the first post. A topic is just a titled collection of posts.
+The OP's post in a topic is simply the first post (sorted by uid ascending). A topic is just a titled collection of posts.
 
 Post 
 
