@@ -74,7 +74,9 @@
         ]
 
        [:div.nav.nav-pills.pull-right.post-controls
-        [:li (link-to {:style "color: red;"} "/"  "7" [:span.glyphicon.glyphicon-heart])]
+        [:li (link-to ;{:style "color: #FF82AB;"}
+              "/"  [:span.glyphicon.glyphicon-heart]
+              )]
         [:li (link-to "/" "Edit")]
         [:li (link-to "/" "Reply")]
         ]
