@@ -3,13 +3,14 @@
   :url "http://github.com/danneu/clj-forum"
   :dependencies
   [[org.clojure/clojure "1.5.1"]
-   [compojure "1.1.5"]
-   [com.datomic/datomic-free "0.8.4020.24"]
-   [org.ocpsoft.prettytime/prettytime "3.1.0.Final"]
-   [hiccup "1.0.4"]
+   [compojure "1.1.5"]  ; routing
+   [com.datomic/datomic-free "0.8.4020.24"]  ; database
+   [org.ocpsoft.prettytime/prettytime "3.1.0.Final"]  ; formats Date -> "2 days ago"
+   [hiccup "1.0.4"]  ; templating
    [ring "1.2.0"]
-   [org.jasypt/jasypt "1.9.1"]
-   [expectations "1.4.55"]]
+   [org.jasypt/jasypt "1.9.1"]  ; password encryption
+   [expectations "1.4.55"]  ; test framework
+   ]
   :plugins [[lein-ring "0.8.5"]]
   :ring {:handler forum.handler/app}
   :profiles
