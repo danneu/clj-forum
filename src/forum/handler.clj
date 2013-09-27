@@ -45,6 +45,9 @@
                                         post))))
   (GET "/users" []
     (forum.controllers.users/index))
+  (GET "/users/:uid" [uid]
+    (println "LOL")
+    (forum.controllers.users/show (Long. uid)))
   (GET "/users/new" []
     (forum.controllers.users/new))
   (POST "/users/create" [user]

@@ -10,6 +10,10 @@
     (layout (forum.views.users/index
              (sort-by :user/uid > users)))))
 
+(defn show [uid]
+  (when-let [user (db/find-user-by-uid uid)]
+    (layout (forum.views.users/show user))))
+
 (defn new []
   (layout (forum.views.users/new)))
 

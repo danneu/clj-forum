@@ -11,6 +11,10 @@
        [:td (:user/uid user)]
        [:td (:user/digest user)]])]))
 
+(defn show [user]
+  (html
+   [:h2 (:user/uname user)]))
+
 (defn new []
   (html
    [:div.row
