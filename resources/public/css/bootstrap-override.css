@@ -90,3 +90,9 @@ body {
 .forum-list .forum-meta {
   text-align: center;
 }
+.header {
+  margin-bottom: 20px;  /* Undo above (back to .navbar) */
+}
+.main-nav {
+  margin-bottom: 20px;
+}

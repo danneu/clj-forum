@@ -1,5 +1,5 @@
 (ns forum.views.master
-  (:use [hiccup core element page util])
+  (:use [hiccup core element form page util])
   (:require [forum.middleware.expose-request :refer [req]]
             [forum.middleware.wrap-current-user :refer [current-user]])
   (:import [java.io StringWriter]))
@@ -11,12 +11,14 @@
      (for [c crumbs]
        [:li c])]))
 
-(defn render-flashes []
-  (when-let [flashes (:flash req)]
+(defn render-flash
+  "Expects flash of the form [:danger 'Message']."
+  []
+  (when-let [[type message] (:flash req)]
     (html
-     (for [flash flashes  ; Ex: [[:danger "Uh oh!"]]
-           :let [[type message] flash]]
-       [:div.alert {:class (str "alert-" (name type))} message]))))
+     (let [alert-class (str "alert-" (name type))]
+       [:div.alert {:class alert-class}
+        message]))))
 
 (defn layout
   "The layout wraps individuals views.
@@ -31,7 +33,6 @@
        (include-css "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css")
        (include-css "/css/bootstrap-override.css")]
       [:body
-
        
        [:div.container
         [:nav.navbar.header
@@ -49,29 +50,35 @@
                             (:user/uname current-user))]])
            ;; If logged out
            (list
-            [:a.pull-right.btn.btn-primary.navbar-btn.btn-sm
-             {:href "/"}
-             "Register"]
             (form-to
                    {:class "navbar-form navbar-right"}
-                   [:post "/sessions/new"]
+                   [:post "/sessions/create"]
                    [:div.form-group
                     (text-field {:class "form-control input-sm"
                                  :placeholder "Username"}
-                                "user[uname]")]
+                                "uname")]
                    [:div.form-group
                     (password-field {:class "form-control input-sm"
                                      :placeholder "Password"}
-                                    "user[pwd]")]
+                                    "pwd")]
                    (submit-button {:class "btn btn-info btn-sm"}
                                   "Log in"))
-                 ))
+
+            [:p.navbar-text.pull-right
+             (link-to {:class "navbar-link"} "/" "Register")
+             " or"]
+
+                 ))  ; /if current-user
          
          [:h3 (link-to {:class "navbar-brand"} "/" "clj-forum")]]
 
-        (render-flashes)
-
         (render-crumbs (:crumbs opts))
+
+        [:ul.nav.nav-tabs.main-nav
+         [:li.active (link-to "/" "Forums")]
+         [:li (link-to "/users" "Users")]]
+
+        (render-flash)
 
         view 
 

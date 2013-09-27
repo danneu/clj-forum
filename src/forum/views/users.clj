@@ -11,13 +11,9 @@
        [:td (:user/uid user)]
        [:td (:user/digest user)]])]))
 
-(defn new [flash]
+(defn new []
   (html
    [:div.row
-
-    (when-let [message (:danger flash)]
-      [:div.alert.alert-danger
-       message])
 
     [:h2 "New User"]
 

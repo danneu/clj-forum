@@ -9,6 +9,7 @@
             [forum.controllers.posts]
             [forum.controllers.topics]
             [forum.controllers.users]
+            [forum.controllers.sessions]
             [forum.middleware.expose-request
              :refer [expose-request]]
             [forum.middleware.wrap-current-user
@@ -44,15 +45,16 @@
                                         post))))
   (GET "/users" []
     (forum.controllers.users/index))
-  (GET "/users/new" [_ :as req]
-    (let [flash (:flash req)]
-      (forum.controllers.users/new flash)))
+  (GET "/users/new" []
+    (forum.controllers.users/new))
   (POST "/users/create" [user]
     (forum.controllers.users/create user))
+  (POST "/sessions/create" [uname pwd]
+    (forum.controllers.sessions/create uname pwd))
   (GET "/logout" []
     (-> (redirect "/")
         (assoc :session nil)
-        (assoc :flash [{:success "You were logged out."}])))
+        (assoc :flash [:success "You were logged out."])))
   (route/resources "/")
   (route/not-found "Not Found"))
 
