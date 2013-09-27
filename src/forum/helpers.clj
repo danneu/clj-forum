@@ -9,6 +9,11 @@
   [topic]
   (first (:forum/_topics topic)))
 
+(defn parent-topic
+  "Given post entity, returns parent topic entity."
+  [post]
+  (first (:topic/_posts post)))
+
 (defn url-for
   "Here's my URL abstraction. Just pass in entity."
   [e]
@@ -16,7 +21,9 @@
    (:user/uid e) (url "/users/" (:user/uid e))
    (:forum/uid e) (str "/forums/" (:forum/uid e))
    (:topic/uid e) (str (url-for (parent-forum e))
-                       "/topics/" (:topic/uid e))))
+                       "/topics/" (:topic/uid e))
+   (:post/uid e) (str (url-for (parent-topic e))
+                      "/posts/" (:post/uid e))))
 
 (defn latest-topic
   "Given a forum entity, returns latest topic
