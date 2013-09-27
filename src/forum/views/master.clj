@@ -34,7 +34,7 @@
 
        
        [:div.container
-        [:div.header
+        [:nav.navbar.header
          ;; [:ul.nav.nav-pills.pull-right
          ;;  [:li (link-to "/" "Home")]
          ;;  [:li (link-to "/users" "Users")]]
@@ -49,25 +49,25 @@
                             (:user/uname current-user))]])
            ;; If logged out
            (list
-            [:a.pull-right.btn.btn-default.navbar-btn
+            [:a.pull-right.btn.btn-primary.navbar-btn.btn-sm
              {:href "/"}
              "Register"]
             (form-to
                    {:class "navbar-form navbar-right"}
                    [:post "/sessions/new"]
                    [:div.form-group
-                    (text-field {:class "form-control"
+                    (text-field {:class "form-control input-sm"
                                  :placeholder "Username"}
                                 "user[uname]")]
                    [:div.form-group
-                    (password-field {:class "form-control"
+                    (password-field {:class "form-control input-sm"
                                      :placeholder "Password"}
                                     "user[pwd]")]
-                   (submit-button {:class "btn btn-default"}
+                   (submit-button {:class "btn btn-info btn-sm"}
                                   "Log in"))
                  ))
          
-         [:h3 (link-to "/" "clj-forum")]]
+         [:h3 (link-to {:class "navbar-brand"} "/" "clj-forum")]]
 
         (render-flashes)
 
