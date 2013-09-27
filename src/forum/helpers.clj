@@ -4,6 +4,20 @@
 
 ;; AKA orphaned functions
 
+(defn posts-asc [topic]
+  (sort-by :post/uid < (:topic/posts topic)))
+
+(defn first-post
+  "Returns the OP's first post in a topic."
+  [topic]
+  (first (posts-asc topic)))
+
+(defn first-post?
+  "Is this the OP's first post in this topic?"
+  [post]
+  (let [topic (first (:topic/_posts post))]
+    (= post (first-post topic))))
+
 (defn parent-forum
   "Given topic entity, returns parent forum entity."
   [topic]

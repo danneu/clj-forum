@@ -16,15 +16,6 @@
             .post .panel-heading { background-color: white; }
             .post .panel-heading { border-bottom: 0; }"]
    [:style ".post .panel-footer { border: 0; padding: 0; }"]
-   [:style ".btn-group>.btn:last-child:not(:first-child),
-            .btn-group>.dropdown-toggle:not(:first-child) {
-              border-top-right-radius: 0;
-            }
-            .btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle) {
-              border-top-left-radius: 0;
-              border-bottom-left-radius: 0;
-            } "]
-
    [:style ".post .post-meta a { color: #ccc; }"]
    [:style ".post .poster-meta .uname { margin-bottom: 5px; }"]
    [:style "
@@ -37,10 +28,13 @@
    (for [post posts
          :let [[user] (:user/_posts post)]]
      [:div.panel.panel-default.post
+      ;; Post modbar
+      [:div.panel-heading.modbar
+       ]
       ;; Post heading
       [:div.panel-heading.clearfix.post-meta
        [:div.pull-right
-        (link-to (url-for post) "3 hours ago")]]
+        (link-to (url-for post) (pretty-date (:post/created post)))]]
       [:div.panel-body
        ;; Post info
        [:div.col-sm-2.poster-meta
@@ -51,11 +45,45 @@
        [:div.col-sm-10
         (:post/text post)]]
       [:div.panel-footer.clearfix
-       [:div.btn-group.btn-group-sm.pull-right
-        [:button.btn.btn-default.post-btn.post-btn {:type "button"} "Edit"]
-        [:button.btn.btn-default.post-btn.post-btn {:type "button"} "Quote"]
-        [:button.btn.btn-default.post-btn.post-btn {:type "button"} "Reply"]
-        ]]])
+
+
+       [:style ".nav.post-controls>li>a {
+                  padding: 0 5px;
+                  color: #999;
+                  font-size: 12px;
+                }"]
+       [:style ".nav.post-controls>li>a:hover {color: #333;}"]
+       [:style ".post-controls a .caret,
+                .post-controls a:hover .caret {
+                  border-bottom-color: black;
+                  border-top-color: #999;
+                }"]
+       [:div.nav.nav-pills.pull-left.post-controls
+        [:li (link-to "/" [:span.glyphicon.glyphicon-exclamation-sign])]
+        [:li.dropdown
+         [:a.dropdown-toggle
+          {:data-toggle "dropdown" :href "/"}
+          "Moderate " [:span.caret]]
+         [:ul.dropdown-menu
+          (if (first-post? post)
+            (list [:li (link-to "/" "Stick")]
+                  [:li (link-to "/" "Lock")]
+                  [:li (link-to "/" "Delete")])
+            (list [:li (link-to "/" "Delete")]))
+          ]]
+        ]
+
+       [:div.nav.nav-pills.pull-right.post-controls
+        [:li (link-to {:style "color: red;"} "/"  "7" [:span.glyphicon.glyphicon-heart])]
+        [:li (link-to "/" "Edit")]
+        [:li (link-to "/" "Reply")]
+        ]
+       
+       ;; [:div.btn-group.btn-group-sm.pull-right
+       ;;  [:button.btn.btn-default.post-btn.post-btn {:type ""} "Edit"]
+       ;;  [:button.btn.btn-default.post-btn.post-btn {:type "button"} "Quote"]
+       ;;  [:button.btn.btn-default.post-btn.post-btn {:type "button"} "Reply"]]
+       ]])
 
    ;; New post form
    [:h3 "New Post"]

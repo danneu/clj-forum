@@ -36,6 +36,7 @@
 
 
    [:style ".topics .topic { padding: 5px 0; }"]
+   [:style ".topics .topic.sticky { background-color: #f5f5f5; }"]
    
    [:h2 (:forum/title forum)]
 
