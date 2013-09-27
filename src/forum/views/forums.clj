@@ -2,15 +2,18 @@
   (:use [hiccup core form page element util])
   (:require [forum.views.master :refer :all]
             [forum.db]
+            [forum.middleware.wrap-current-user
+             :refer [current-user]]
             [forum.helpers :refer :all]))
 
 (defn index [forums]
   (html
    ;; Jumbotron only should annoy guests on forumlist.
-   [:div.jumbotron
-    [:h1 "clj-forum"]
-    [:p.lead "Where thugs get it free and you've gotta be a G."]
-    [:p [:a.btn.btn-lg.btn-success {:href "/users/new"} "Sign up"]]]
+   (when-not current-user
+     [:div.jumbotron
+      [:h1 "clj-forum"]
+      [:p.lead "Where thugs get it free and you've gotta be a G."]
+      [:p [:a.btn.btn-lg.btn-success {:href "/users/new"} "Sign up"]]])
 
    ;; List all forums. TODO: In position order.
    [:div.list-group.forum-list
