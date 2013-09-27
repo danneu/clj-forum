@@ -44,12 +44,6 @@ resource that can be opened by io/reader."
 (defn tempid []
   (d/tempid :db.part/user))
 
-(defn q [query]
-  (d/q query (d/db conn)))
-
-(defn entity [e]
-  (d/entity (d/db conn) e))
-
 (defn only
   "Returns the only item from a query result"
   [query-result]
