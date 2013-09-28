@@ -1,6 +1,7 @@
 (ns forum.controllers.forums
   (:require [forum.db :as db]
             [forum.views.forums]
+            [forum.helpers :refer :all]
             [forum.views.master :refer :all]))
 
 ;; TODO: Should in presenter or something
@@ -12,12 +13,13 @@
 (defn index []
   (let [forums (for [forum (forum.db/find-all-forums)]
                  (assoc-posts-count forum))]
-    (layout (forum.views.forums/index forums))))
+    (layout {:crumbs []}
+            (forum.views.forums/index forums))))
 
 (defn show [fuid]
   (when-let [forum (forum.db/find-forum-by-uid fuid)]
     (let [topics (:forum/topics forum)]
       (layout
-       {:crumbs []}
+       {:crumbs [(:forum/title forum)]}
        (forum.views.forums/show forum
                                 (sort-by :topic/uid > topics))))))

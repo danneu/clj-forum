@@ -57,7 +57,10 @@
        ;; Latest post
        [:div.col-sm-3
         [:div
-         (link-to "/" "Latest post")
+         (link-to (url-for topic
+                           "#post-"
+                           (:post/uid latest-post))
+                  "Latest post")
          " by "
          (link-to (url-for latest-creator)
                   (:user/uname latest-creator))]

@@ -85,13 +85,17 @@
              " or"])
            )  ; /if current-user
          
-         [:h3 (link-to {:class "navbar-brand"} "/" "clj-forum")]]
+         [:div.navbar-header
+          [:h3 (link-to {:class "navbar-brand"} "/" "clj-forum")]]
+         [:ul.nav.navbar-nav
+          [:li (link-to "/users" "Users")]]
+         ]
 
         (render-crumbs (:crumbs opts))
 
-        [:ul.nav.nav-tabs.main-nav
-         [:li.active (link-to "/" "Forums")]
-         [:li (link-to "/users" "Users")]]
+        ;; [:ul.nav.nav-tabs.main-nav
+        ;;  [:li.active (link-to "/" "Forums")]
+        ;;  [:li (link-to "/users" "Users")]]
 
         (render-flash)
 

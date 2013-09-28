@@ -15,7 +15,8 @@
         ;; TODO: Create a url generator from resources.
         (layout
          {:crumbs [(link-to (url "/forums/" fuid)
-                            (:forum/title forum))]}
+                            (:forum/title forum))
+                   (:topic/title topic)]}
          (forum.views.topics/show forum
                                   topic
                                   ;; Old posts come first

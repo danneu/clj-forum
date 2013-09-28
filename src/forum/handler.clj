@@ -5,13 +5,14 @@
             [clojure.java.io :as io]
             [compojure.handler :as handler]
             [compojure.route :as route]
+            [hiccup.middleware]
             [forum.controllers.forums]
             [forum.controllers.posts]
             [forum.controllers.topics]
             [forum.controllers.users]
             [forum.controllers.sessions]
             [forum.middleware.expose-request
-             :refer [expose-request]]
+             :refer [expose-request req]]
             [forum.middleware.wrap-current-user
              :refer [current-user wrap-current-user]]
             [ring.middleware.session.cookie
@@ -36,13 +37,16 @@
     (context ["/topics/:tuid", :topicid #"[0-9]+"] [tuid]
       ;; /forums/:fuid/topics/:tuid
       (GET "/" []
-        (forum.controllers.topics/show (Long. fuid)
-                                       (Long. tuid)))
+        (forum.controllers.topics/show (Long. fuid) (Long. tuid)))
       ;; /forums/:fuid/topics/:tuid/posts
       (POST "/posts" [post]
-        (forum.controllers.posts/create (Long. fuid)
-                                        (Long. tuid)
-                                        post))))
+        (forum.controllers.posts/create (Long. fuid) (Long. tuid) post))
+      (PUT "/posts/:puid" [puid post]
+        (forum.controllers.posts/update (Long. puid) post))
+      (GET "/posts/:puid/edit" [puid]
+        (forum.controllers.posts/edit (Long. fuid)
+                                      (Long. tuid)
+                                      (Long. puid)))))
   (GET "/users" []
     (forum.controllers.users/index))
   (GET "/users/new" []
@@ -73,6 +77,8 @@
 
 (def app
   (-> app-routes
+      ;; TODO: don't hardcode base-url like this.
+      (hiccup.middleware/wrap-base-url "http://localhost:3000")
       expose-request
       wrap-current-user
       (handler/site {:session session-opts})))

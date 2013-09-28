@@ -1,8 +1,33 @@
 (ns forum.controllers.posts
-  (:require [forum.db]
+  (:use [hiccup core form page element util])
+  (:require [forum.db :as db]
             [ring.util.response :refer [redirect]]
+            [forum.views.master :refer :all]
+            [forum.views.posts]
+            [forum.helpers :refer :all]
             [forum.middleware.wrap-current-user
              :refer [current-user]]))
+
+(defn edit [fuid tuid puid]
+  (when-let [forum (db/find-forum-by-uid fuid)]
+    (when-let [topic (db/find-topic-by-uid tuid)]
+      (when-let [post (db/find-post-by-uid puid)]
+        (layout
+         {:crumbs [(link-to (url-for forum) (:forum/title forum))
+                   (link-to (url-for topic) (:topic/title topic))
+                   "Edit Post"]}
+         (forum.views.posts/edit topic post))))))
+
+(defn update [puid {text :text}]
+  ;; Do validation
+  (when-let [post (db/find-post-by-uid puid)]
+    ;; Due to my created-entity fn, update-post returns nil if
+    ;; the update didn't actually change the text of the post.
+    ;; TODO: Figure out what I wanna to do.
+    (if (db/update-post puid text)
+      (-> (redirect (url-for (parent-topic post) "#post-" (:post/uid post)))
+          (assoc :flash [:success "Successfully edited post"]))
+      ":)")))
 
 ;; post: {:text ""}
 (defn create [fuid tuid post-params]

@@ -20,7 +20,7 @@ be opened by io/reader"
 resource that can be opened by io/reader."
   [conn f]
   (doseq [txd (read-all f)]
-    (d/transact conn txd))
+    @(d/transact conn txd))
   :done)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -117,6 +117,9 @@ resource that can be opened by io/reader."
 (defn find-topic-by-uid [uid]
   (find-by (d/db conn) :topic/uid uid))
 
+(defn find-post-by-uid [uid]
+  (find-by (d/db conn) :post/uid uid))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; TODO: This is roundabout. Can I think of something better?
@@ -129,15 +132,6 @@ resource that can be opened by io/reader."
   (d/entity (:db-after tx-result)
             (:e (first (filter #(= val (:v %))
                                (:tx-data tx-result))))))
-
-(defn create-user
-  "Returns uid or nil."
-  [uname pwd]
-  (let [digest (forum.authentication/encrypt pwd)
-        eid (tempid)
-        result @(d/transact
-                 conn [[:user/construct eid uname digest]])]
-    (:user/uid (created-entity result :user/uname uname))))
 
 (defn create-user
   "Returns uid or nil."
@@ -170,6 +164,13 @@ resource that can be opened by io/reader."
   (let [result @(d/transact
                  conn
                  [[:post/construct user-uid tuid text]])]
+    (:post/uid (created-entity result :post/text text))))
+
+(defn update-post
+  "Return uid or nil."
+  [puid text]
+  (let [result @(d/transact conn [[:post/update puid text]])]
+    ;; TODO: Change name of created-entity fn...
     (:post/uid (created-entity result :post/text text))))
 
 ;; Seed the DB ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -224,13 +225,13 @@ resource that can be opened by io/reader."
 (defn seed
   "To be run from cli: lein run -m forum.db/seed"
   []
+  (d/release conn)
   (def conn (create-db))
   (seed-db conn 5 5)
   (let [posts (find-all-posts)]
     (prn {:post-count (count posts)
           :latest-post ((comp :post/created first) (sort-by :post/uid #(> %1 %2) (find-all-posts)))})
     :done))
-
 
 (defn forum-posts-count [feid]
   (let [result (d/q '[:find (count ?p)
@@ -239,4 +240,8 @@ resource that can be opened by io/reader."
                       [?t :topic/posts ?p]]
                     (d/db conn) feid)]
     (only result)))
+
+;; (seed)
+
+(count (find-all-forums))
 

@@ -101,4 +101,17 @@
       {:db/id (d/tempid :db.part/user)
        :user/uid user-uid
        :user/posts peid}])}}
-]
+
+ ;; Post updater
+ {:db/id #db/id[:db.part/user]
+  :db/ident :post/update
+  :db/fn #db/fn
+  {:lang :clojure
+   :params [db puid text]
+   :require [datomic.api :as d]
+   :code
+   [{:db/id (d/tempid :db.part/user)
+     :post/uid puid
+     :post/text text}]}}
+
+ ]

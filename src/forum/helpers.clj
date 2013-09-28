@@ -1,5 +1,7 @@
 (ns forum.helpers
   (:use [hiccup core page form element util])
+  (:require [clojure.string :as str]
+            [hiccup.util :refer [*base-url*]])
   (:import [org.ocpsoft.prettytime PrettyTime]))
 
 ;; AKA orphaned functions
@@ -28,16 +30,24 @@
   [post]
   (first (:topic/_posts post)))
 
+(defn path-for
+  [e & args]
+  (let [base-path
+        (cond
+         (:user/uid e) (str "/users/" (:user/uid e))
+         (:forum/uid e) (str "/forums/" (:forum/uid e))
+         (:topic/uid e) (str (path-for (parent-forum e))
+                             "/topics/" (:topic/uid e))
+         (:post/uid e) (str (path-for (parent-topic e))
+                            "/posts/" (:post/uid e)))]
+    (str base-path (str/join args))))
+
 (defn url-for
-  "Here's my URL abstraction. Just pass in entity."
-  [e]
-  (cond
-   (:user/uid e) (url "/users/" (:user/uid e))
-   (:forum/uid e) (str "/forums/" (:forum/uid e))
-   (:topic/uid e) (str (url-for (parent-forum e))
-                       "/topics/" (:topic/uid e))
-   (:post/uid e) (str (url-for (parent-topic e))
-                      "/posts/" (:post/uid e))))
+  "Here's my URL abstraction. Just pass in entity.
+   (url-for user)          ;=> /users/42
+   (url-for user '/edit')  ;=> /users/42/edit"
+  [e & args]
+  (str *base-url* (apply path-for e args)))
 
 (defn latest-topic
   "Given a forum entity, returns latest topic
@@ -69,5 +79,4 @@
   "Turn Date into string of 'about 10 minutes ago'."
   [date]
   (.format (PrettyTime.) date))
-
 

@@ -1,4 +1,5 @@
 (ns forum.controllers.users
+  (:use [hiccup core element form page util])
   (:require [forum.views.master :refer :all]
             [forum.views.users]
             [forum.db :as db]
@@ -7,12 +8,14 @@
 
 (defn index []
   (let [users (db/find-all-users)]
-    (layout (forum.views.users/index
+    (layout {:crumbs ["Users"]}
+            (forum.views.users/index
              (sort-by :user/uid > users)))))
 
 (defn show [uid]
   (when-let [user (db/find-user-by-uid uid)]
-    (layout (forum.views.users/show user))))
+    (layout {:crumbs [(link-to "/users" "Users")
+                      (:user/uname user)]} (forum.views.users/show user))))
 
 (defn new []
   (layout (forum.views.users/new)))
