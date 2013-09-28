@@ -5,18 +5,15 @@
             [clojure.java.io :as io]
             [compojure.handler :as handler]
             [compojure.route :as route]
-            [hiccup.middleware]
             [forum.controllers.forums]
             [forum.controllers.posts]
             [forum.controllers.topics]
             [forum.controllers.users]
             [forum.controllers.sessions]
-            [forum.middleware.expose-request
-             :refer [expose-request req]]
-            [forum.middleware.wrap-current-user
-             :refer [current-user wrap-current-user]]
-            [ring.middleware.session.cookie
-             :refer [cookie-store]]
+            [forum.middleware.expose-request :refer [expose-request req]]
+            [forum.middleware.wrap-current-user :refer [current-user wrap-current-user]]
+            [hiccup.middleware :refer [wrap-base-url]]
+            [ring.middleware.session.cookie :refer [cookie-store]]
             [ring.util.response :refer [redirect]]))
 
 ;; - The Router should do preliminary checking on params.
@@ -78,7 +75,7 @@
 (def app
   (-> app-routes
       ;; TODO: don't hardcode base-url like this.
-      (hiccup.middleware/wrap-base-url "http://localhost:3000")
+      (wrap-base-url "http://localhost:3000")
       expose-request
       wrap-current-user
       (handler/site {:session session-opts})))

@@ -1,18 +1,12 @@
 (ns forum.controllers.posts
-  (:use [hiccup core form page element util])
-  (:require [forum.db :as db]
-            [ring.util.response :refer [redirect]]
-            [forum.views.master :refer :all]
-            [forum.views.posts]
-            [forum.helpers :refer :all]
-            [forum.middleware.wrap-current-user
-             :refer [current-user]]))
+  (:require [forum.controllers.base :refer [load-base]]))
+(load-base)
 
 (defn edit [fuid tuid puid]
   (when-let [forum (db/find-forum-by-uid fuid)]
     (when-let [topic (db/find-topic-by-uid tuid)]
       (when-let [post (db/find-post-by-uid puid)]
-        (layout
+        (forum.views.master/layout
          {:crumbs [(link-to (url-for forum) (:forum/title forum))
                    (link-to (url-for topic) (:topic/title topic))
                    "Edit Post"]}

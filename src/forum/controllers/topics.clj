@@ -1,11 +1,6 @@
 (ns forum.controllers.topics
-  (:use [hiccup element page util])
-  (:require [forum.db]
-            [forum.views.topics]
-            [forum.views.master :refer :all]
-            [forum.middleware.wrap-current-user
-             :refer [current-user]]
-            [ring.util.response :refer [redirect]]))
+  (:require [forum.controllers.base :refer [load-base]]))
+(load-base)
 
 (defn show [fuid tuid]
   (when-let [forum (forum.db/find-forum-by-uid fuid)]
@@ -13,7 +8,7 @@
       (let [posts (:topic/posts topic)]
         ;; TODO: Put the sort-by in forum.db layer or something.
         ;; TODO: Create a url generator from resources.
-        (layout
+        (forum.views.master/layout
          {:crumbs [(link-to (url "/forums/" fuid)
                             (:forum/title forum))
                    (:topic/title topic)]}
