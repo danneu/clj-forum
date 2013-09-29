@@ -1,60 +1,47 @@
 (ns forum.validation
   (:require [clojure.string :as str]
-            [forum.db :as db]))
+            [forum.db :as db]
+            [bouncer.core :as b]
+            [bouncer.validators :as v]))
 
-;; Util ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(v/defvalidator valid-uname-length
+  {:default-message-format "Username must be 3 to 15 characters"}
+  [uname]
+  (<= 3 (count uname) 15))
 
-(defn condense-string
-  "Trim and condense whitespace.
-   Turn nil into empty string."
-  [s]
-  (if (nil? s)
-    ""
-    (as-> s _
-          (str/replace _ #"\s+" " ")
-          (str/trim _))))
+(v/defvalidator valid-pwd-length
+  {:default-message-format "Password must be 6 to 50 characters"}
+  [pwd]
+  (<= 6 (count pwd) 50))
 
-;; User params ;;;;;;;;;;;;;;;;;;;;;;;;;
+(v/defvalidator pwd-confirmed
+  {:default-message-format "Password confirmation must match password."}
+  [confirm-pwd pwd]
+  (= confirm-pwd pwd))
 
-;; I think validators will start with a
-;; prep fn that massages the data.
-(defn prep-user-params
-  [{:keys [uname] :as user}]
-  (merge user
-         {:uname (condense-string uname)}))
+(v/defvalidator uname-unique
+  {:default-message-format "Username is taken"}
+  [uname]
+  (nil? (db/find-user-by-uname uname)))
 
-(defn validate-user-params [user-params]
-  (let [u (prep-user-params user-params)]
-    ((apply
-      some-fn
-      [(fn [{uname :uname}]
-         (when (or (empty? uname)
-                   (nil? uname))
-           "Username is blank"))
-       (fn [{pwd :pwd}]
-         (when (or (empty? pwd)
-                   (nil? pwd))
-           "Password is blank"))
-       (fn [u]
-         (when (not= (:pwd u)
-                     (:confirm-pwd u))
-           "Passwords don't match"))
-       (fn [{uname :uname}]
-         (when (> 3 (count uname))
-           "Username must be at least 3 chars"))
-       (fn [{uname :uname}]
-         (when (< 15 (count uname))
-           "Username must be shorter than 16 chars"))
-       (fn [{pwd :pwd}]
-         (when (> 6 (count pwd))
-           "Password must be at least 6 chars"))
-       (fn [{pwd :pwd}]
-         (when (< 30 (count pwd))
-           "Password must be no longer than 30 chars"))
-       (fn [{uname :uname}]
-         (when (db/find-user-by-uname
-                uname)
-           "Username is taken"))])
-     u)))
+(defn validate-user
+  "Returns bouncer validation vector.
+   Errors: [{:uname ('Username required') :pwd ('Password required')} ...]
+   No errors: [nil ...]"
+  [user]
+  (let [pwd (:pwd user)]
+    (b/validate
+     user 
+     :uname [[v/required :message "Username required"]
+             valid-uname-length]
+     :pwd [[v/required :message "Password required"]
+           valid-pwd-length]
+     :confirm-pwd [[pwd-confirmed pwd]])))
 
+;; Public functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn user-errors
+  "Returns nil or a collection of error strings."
+  [user]
+  (let [[error-map] (validate-user user)]
+    (flatten (vals error-map))))

@@ -20,8 +20,11 @@
   (forum.views.master/layout (forum.views.users/new)))
 
 (defn create [user-params]
-  (if-let [error (forum.validation/validate-user-params user-params)]
-    (assoc (redirect "/users/new") :flash [:danger error])
+  (if-let [errors (forum.validation/user-errors user-params)]
+    (assoc (redirect "/users/new")
+           :flash
+           [:danger (for [error errors]
+                      [:li error])])
     (let [useruid (db/create-user (:uname user-params)
                                   (:pwd user-params))]
       (-> (redirect "/users")
