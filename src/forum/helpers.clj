@@ -30,25 +30,6 @@
   [post]
   (first (:topic/_posts post)))
 
-(defn path-for
-  [e & args]
-  (let [base-path
-        (cond
-         (:user/uid e) (str "/users/" (:user/uid e))
-         (:forum/uid e) (str "/forums/" (:forum/uid e))
-         (:topic/uid e) (str (path-for (parent-forum e))
-                             "/topics/" (:topic/uid e))
-         (:post/uid e) (str (path-for (parent-topic e))
-                            "/posts/" (:post/uid e)))]
-    (str base-path (str/join args))))
-
-(defn url-for
-  "Here's my URL abstraction. Just pass in entity.
-   (url-for user)          ;=> /users/42
-   (url-for user '/edit')  ;=> /users/42/edit"
-  [e & args]
-  (str *base-url* (apply path-for e args)))
-
 (defn latest-topic
   "Given a forum entity, returns latest topic
    by createdAt although it should be by latest post bump."
@@ -80,3 +61,28 @@
   [date]
   (.format (PrettyTime.) date))
 
+;; URL resolution ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn path-for
+  "Returns the path of an entity.
+   /forums/1
+   /forums/1/topics/3
+   /forums/1/topics/3/posts/9"
+  [e & args]
+  (let [base-path
+        (cond
+         (:user/uid e) (str "/users/" (:user/uid e))
+         (:forum/uid e) (str "/forums/" (:forum/uid e))
+         (:topic/uid e) (str (path-for (parent-forum e))
+                             "/topics/" (:topic/uid e))
+         (:post/uid e) (str (path-for (parent-topic e))
+                            "/posts/" (:post/uid e)))]
+    (str base-path (str/join args))))
+
+(defn url-for
+  "Returns path of an entity concat with base url.
+   http://base-url.com/forums/1
+   http://base-url.com/forums/1/topics/3
+   http://base-url.com/forums/1/topics/3/posts/9 "
+  [e & args]
+  (str *base-url* (apply path-for e args)))
