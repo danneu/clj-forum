@@ -24,14 +24,14 @@
 (defroutes app-routes
   (GET "/" []
     (forum.controllers.forums/index))
-  (context ["/forums/:fuid", :forumid #"[0-9]+"] [fuid]
+  (context ["/forums/:fuid", :fuid #"[0-9]+"] [fuid]
     ;; /forums/:fuid
     (GET "/" []
       (forum.controllers.forums/show (Long. fuid)))
     ;; /forums/:fuid/topics
     (POST "/topics" [topic]
       (forum.controllers.topics/create (Long. fuid) topic))
-    (context ["/topics/:tuid", :topicid #"[0-9]+"] [tuid]
+    (context ["/topics/:tuid", :tuid #"[0-9]+"] [tuid]
       ;; /forums/:fuid/topics/:tuid
       (GET "/" []
         (forum.controllers.topics/show (Long. fuid) (Long. tuid)))
