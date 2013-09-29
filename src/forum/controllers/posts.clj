@@ -28,8 +28,19 @@
   ;; TODO: Add post validation
   (when-let [forum (forum.db/find-forum-by-uid fuid)]
     (when-let [topic (forum.db/find-topic-by-uid tuid)]
-      (let [user-uid (:user/uid current-user)]
-        (if-let [puid (forum.db/create-post
-                       user-uid tuid (:text post-params))]
-          (redirect (str "/forums/" fuid "/topics/" tuid))
-          "Error creating post. ^_^")))))
+      (when-let [user-uid (:user/uid current-user)]
+        (if-let [errors (forum.validation/post-errors post-params)]
+          (-> (redirect (make-url "/forums/" fuid "/topics/" tuid))
+              (assoc :flash [:danger (for [error errors]
+                                       [:li error])]))
+          ;; For now I expect transactor to throw exception
+          ;; if create-post fails.
+          ;; TODO: Figure out how I should handle such an event.
+          (when-let [puid (db/create-post
+                           user-uid
+                           tuid
+                           (:text post-params))]
+            (-> (redirect (str "/forums/" fuid
+                               "/topics/" tuid
+                               "#post-" puid))
+                (assoc :flash [:success "Successfully posted."]))))))))

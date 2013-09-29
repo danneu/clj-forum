@@ -4,6 +4,11 @@
             [bouncer.core :as b]
             [bouncer.validators :as v]))
 
+;; I guess stuff like missing user-uid and tuid should
+;; be exceptions thrown by transactor?
+
+;; User validation ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (v/defvalidator valid-uname-length
   {:default-message-format "Username must be 3 to 15 characters"}
   [uname]
@@ -38,7 +43,25 @@
            valid-pwd-length]
      :confirm-pwd [[pwd-confirmed pwd]])))
 
+;; Post validation ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(v/defvalidator valid-text-length
+  {:default-message-format "Post must be 10 to 10,000 characters"}
+  [text]
+  (<= 3 (count text) 15))
+
+(defn validate-post
+  "Expects: {:text _}"
+  [post]
+  (b/validate post :text valid-text-length))
+
 ;; Public functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn post-errors
+  "Returns nil or a collection of error strings."
+  [post]
+  (let [[error-map] (validate-post post)]
+    (flatten (vals error-map))))
 
 (defn user-errors
   "Returns nil or a collection of error strings."

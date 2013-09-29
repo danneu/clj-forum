@@ -86,3 +86,8 @@
    http://base-url.com/forums/1/topics/3/posts/9 "
   [e & args]
   (str *base-url* (apply path-for e args)))
+
+(defn make-url
+  "Concats arbitrary strings with *base-url*."
+  [& args]
+  (str *base-url* (str/join args)))
