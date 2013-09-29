@@ -17,12 +17,18 @@
                                   ;; Old posts come first
                                   (sort-by :post/uid < posts)))))))
 
-(defn create [fuid topic]
+(defn create [fuid topic-params]
+  (prn topic-params)
   (when-let [forum (forum.db/find-forum-by-uid fuid)]
-    (if-let [tuid (forum.db/create-topic
-                   (:user/uid current-user)
-                   fuid
-                   (:title topic)
-                   (:text (:post topic)))]
-      (redirect (str "/forums/" fuid "/topics/" tuid))
-      "Error creating thread. ^_^")))
+    (when-let [user-uid (:user/uid current-user)]
+      (if-let [errors (forum.validation/topic-errors topic-params)]
+        (-> (redirect (url-for forum))
+            (assoc :flash [:danger (for [error errors]
+                                     [:li error])]))
+        (when-let [tuid (db/create-topic user-uid
+                                         fuid
+                                         (:title topic-params)
+                                         (:text topic-params))]
+          (-> (redirect (make-url "/forums/" fuid
+                                  "/topics/" tuid))
+              (assoc :flash [:success "Successfully created topic."])))))))

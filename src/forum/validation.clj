@@ -46,25 +46,46 @@
 ;; Post validation ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (v/defvalidator valid-text-length
-  {:default-message-format "Post must be 10 to 10,000 characters"}
+  {:default-message-format "Text must be 10 to 10,000 characters"}
   [text]
-  (<= 3 (count text) 15))
+  (<= 10 (count text) 10000))
 
 (defn validate-post
   "Expects: {:text _}"
   [post]
   (b/validate post :text valid-text-length))
 
+;; Topic validation
+
+(v/defvalidator valid-title-length
+  {:default-message-format "Title must be 3 to 60 characters"}
+  [title]
+  (<= 3 (count title) 60))
+
+(defn validate-topic
+  "Expects: {:title _
+             :text _}"
+  [topic]
+  (b/validate topic
+              :text valid-text-length
+              :title valid-title-length))
+
 ;; Public functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn post-errors
   "Returns nil or a collection of error strings."
-  [post]
-  (let [[error-map] (validate-post post)]
-    (flatten (vals error-map))))
+  [post-params]
+  (let [[error-map] (validate-post post-params)]
+    (not-empty (flatten (vals error-map)))))
 
 (defn user-errors
   "Returns nil or a collection of error strings."
-  [user]
-  (let [[error-map] (validate-user user)]
-    (flatten (vals error-map))))
+  [user-params]
+  (let [[error-map] (validate-user user-params)]
+    (not-empty (flatten (vals error-map)))))
+
+(defn topic-errors
+  "Returns nil or a collection of error strings."
+  [topic-params]
+  (let [[error-map] (validate-topic topic-params)]
+    (not-empty (flatten (vals error-map)))))

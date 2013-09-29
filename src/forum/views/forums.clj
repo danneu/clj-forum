@@ -78,5 +78,5 @@
      [:div.form-group
       (text-area {:class "form-control"
                   :placeholder "Post"}
-                 "topic[post][text]")]
+                 "topic[text]")]
      (submit-button {:class "btn btn-default"} "Submit"))))
