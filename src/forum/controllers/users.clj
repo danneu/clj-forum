@@ -13,7 +13,8 @@
   (when-let [user (db/find-user-by-uid uid)]
     (forum.views.master/layout
      {:crumbs [(link-to "/users" "Users")
-               (:user/uname user)]} (forum.views.users/show user))))
+               (:user/uname user)]}
+     (forum.views.users/show user))))
 
 (defn new []
   (forum.views.master/layout (forum.views.users/new)))

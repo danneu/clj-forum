@@ -1,7 +1,7 @@
 (ns forum.controllers.sessions
-  (:require [forum.db :as db]
-            [forum.authentication :refer [match?]]
-            [ring.util.response :refer [redirect]]))
+  (:require [forum.controllers.base :refer [load-base]]
+            [forum.authentication :refer [match?]]))
+(load-base)
 
 (defn create [uname pwd]
   (let [user (db/find-user-by-uname uname)]
