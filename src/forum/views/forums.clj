@@ -64,7 +64,7 @@
          " by "
          (link-to (url-for latest-creator)
                   (:user/uname latest-creator))]
-        (pretty-date (:topic/created topic))]])]
+        (pretty-date (:post/created latest-post))]])]
 
    ;; New topic form
    [:h3 "New Topic"]
