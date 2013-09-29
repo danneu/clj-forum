@@ -16,34 +16,25 @@
             [ring.middleware.session.cookie :refer [cookie-store]]
             [ring.util.response :refer [redirect]]))
 
-;; - The Router should do preliminary checking on params.
-;;   I've decided to cast params to Longs in the Router instead
-;;   of downchain in Controllers where it's easy to forget.
 ;; - Controllers do all the DB calls and pass entities into Views.
 
 (defroutes app-routes
   (GET "/" []
     (forum.controllers.forums/index))
-  (context ["/forums/:fuid", :fuid #"[0-9]+"] [fuid]
-    ;; /forums/:fuid
+  (context "/forums/:fuid" [fuid]
     (GET "/" []
-      (forum.controllers.forums/show (Long. fuid)))
-    ;; /forums/:fuid/topics
+      (forum.controllers.forums/show fuid))
     (POST "/topics" [topic]
-      (forum.controllers.topics/create (Long. fuid) topic))
-    (context ["/topics/:tuid", :tuid #"[0-9]+"] [tuid]
-      ;; /forums/:fuid/topics/:tuid
+      (forum.controllers.topics/create fuid topic))
+    (context "/topics/:tuid" [tuid]
       (GET "/" []
-        (forum.controllers.topics/show (Long. fuid) (Long. tuid)))
-      ;; /forums/:fuid/topics/:tuid/posts
+        (forum.controllers.topics/show fuid tuid))
       (POST "/posts" [post]
-        (forum.controllers.posts/create (Long. fuid) (Long. tuid) post))
+        (forum.controllers.posts/create fuid tuid post))
       (PUT "/posts/:puid" [puid post]
-        (forum.controllers.posts/update (Long. puid) post))
+        (forum.controllers.posts/update puid post))
       (GET "/posts/:puid/edit" [puid]
-        (forum.controllers.posts/edit (Long. fuid)
-                                      (Long. tuid)
-                                      (Long. puid)))))
+        (forum.controllers.posts/edit fuid tuid puid))))
   (GET "/users" []
     (forum.controllers.users/index))
   (GET "/users/new" []
@@ -51,7 +42,7 @@
   (POST "/users/create" [user]
     (forum.controllers.users/create user))
   (GET "/users/:uid" [uid]
-    (forum.controllers.users/show (Long. uid)))
+    (forum.controllers.users/show uid))
   (POST "/sessions/create" [uname pwd]
     (forum.controllers.sessions/create uname pwd))
   (GET "/logout" []

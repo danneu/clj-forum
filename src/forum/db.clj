@@ -106,19 +106,19 @@ resource that can be opened by io/reader."
   (flatten (find-all-by (d/db conn) :post/uid)))
 
 (defn find-forum-by-uid [uid]
-  (find-by (d/db conn) :forum/uid uid))
+  (find-by (d/db conn) :forum/uid (Long. uid)))
 
 (defn find-user-by-uid [uid]
-  (find-by (d/db conn) :user/uid uid))
+  (find-by (d/db conn) :user/uid (Long. uid)))
 
 (defn find-user-by-uname [uname]
   (find-by (d/db conn) :user/uname uname))
 
 (defn find-topic-by-uid [uid]
-  (find-by (d/db conn) :topic/uid uid))
+  (find-by (d/db conn) :topic/uid (Long. uid)))
 
 (defn find-post-by-uid [uid]
-  (find-by (d/db conn) :post/uid uid))
+  (find-by (d/db conn) :post/uid (Long. uid)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -155,7 +155,10 @@ resource that can be opened by io/reader."
   [user-uid fuid title text]
   (let [result @(d/transact conn
                             [[:topic/construct
-                              user-uid fuid title text]])]
+                              (Long. user-uid)
+                              (Long. fuid)
+                              title
+                              text]])]
     (:topic/uid (created-entity result :topic/title title))))
 
 (defn create-post
@@ -163,13 +166,18 @@ resource that can be opened by io/reader."
   [user-uid tuid text]
   (let [result @(d/transact
                  conn
-                 [[:post/construct user-uid tuid text]])]
+                 [[:post/construct
+                   (Long. user-uid)
+                   (Long. tuid)
+                   text]])]
     (:post/uid (created-entity result :post/text text))))
 
 (defn update-post
   "Return uid or nil."
   [puid text]
-  (let [result @(d/transact conn [[:post/update puid text]])]
+  (let [result @(d/transact conn [[:post/update
+                                   (Long. puid)
+                                   text]])]
     ;; TODO: Change name of created-entity fn...
     (:post/uid (created-entity result :post/text text))))
 
@@ -240,8 +248,3 @@ resource that can be opened by io/reader."
                       [?t :topic/posts ?p]]
                     (d/db conn) feid)]
     (only result)))
-
-;; (seed)
-
-(count (find-all-forums))
-
