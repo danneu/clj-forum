@@ -19,40 +19,27 @@
 ;; - Controllers do all the DB calls and pass entities into Views.
 
 (defroutes app-routes
-  (GET "/" []
-    (forum.controllers.forums/index))
+  (GET "/" [] (forum.controllers.forums/index))
   (context "/forums/:fuid" [fuid]
-    (GET "/" []
-      (forum.controllers.forums/show fuid))
-    (POST "/topics" [topic]
-      (forum.controllers.topics/create fuid topic))
+    (GET "/" [] (forum.controllers.forums/show fuid))
+    (POST "/topics" [topic] (forum.controllers.topics/create fuid topic))
     (context "/topics/:tuid" [tuid]
-      (GET "/" []
-        (forum.controllers.topics/show fuid tuid))
-      (POST "/posts" [post]
-        (forum.controllers.posts/create fuid tuid post))
-      (PUT "/posts/:puid" [puid post]
-        (forum.controllers.posts/update puid post))
-      (GET "/posts/:puid/edit" [puid]
-        (forum.controllers.posts/edit fuid tuid puid))))
-  (GET "/users" []
-    (forum.controllers.users/index))
-  (GET "/users/new" []
-    (forum.controllers.users/new))
-  (POST "/users/create" [user]
-    (forum.controllers.users/create user))
-  (GET "/users/:uid" [uid]
-    (forum.controllers.users/show uid))
-  (POST "/sessions/create" [uname pwd]
-    (forum.controllers.sessions/create uname pwd))
-  (GET "/logout" []
-    (-> (redirect "/")
-        (assoc :session nil)
-        (assoc :flash [:success "You were logged out."])))
+      (GET "/" [] (forum.controllers.topics/show fuid tuid))
+      (context "/posts" []
+        (POST "/" [post] (forum.controllers.posts/create fuid tuid post))
+        (PUT "/:puid" [puid post] (forum.controllers.posts/update puid post))
+        (GET "/:puid/edit" [puid] (forum.controllers.posts/edit fuid tuid puid)))))
+  (context "/users" []
+    (GET "/" [] (forum.controllers.users/index))
+    (GET "/new" [] (forum.controllers.users/new))
+    (POST "/create" [user] (forum.controllers.users/create user))
+    (GET "/:uid" [uid] (forum.controllers.users/show uid)))
+  (POST "/sessions/create" [uname pwd] (forum.controllers.sessions/create uname pwd))
+  (GET "/logout" [] (forum.controllers.sessions/destroy))
   (route/resources "/")
   (route/not-found "Not Found"))
 
-;; Config
+;; Config ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def config
   ;; {:session-secret String}
@@ -62,6 +49,8 @@
 ;; with AES key defined as :session-secret config.edn.
 (def session-opts
   {:store (cookie-store {:key (:session-secret config)})})
+
+;; Middleware ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def app
   (-> app-routes

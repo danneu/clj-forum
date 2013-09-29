@@ -3,17 +3,16 @@
             [forum.authentication :refer [match?]]
             [ring.util.response :refer [redirect]]))
 
-(defn- fail-authentication []
-  (-> (redirect "/")
-      (assoc :flash [:danger "Invalid credentials."])))
-
-;; Actions
-
 (defn create [uname pwd]
-  (if-let [user (db/find-user-by-uname uname)]
+  (let [user (db/find-user-by-uname uname)]
     (if (match? pwd (:user/digest user))
       (-> (redirect "/")
           (assoc :session (select-keys user [:user/uid]))
           (assoc :flash [:success "Successfully logged in."]))
-      (fail-authentication))
-    (fail-authentication)))
+      (-> (redirect "/")
+          (assoc :flash [:danger "Invalid credentials."])))))
+
+(defn destroy []
+  (-> (redirect "/")
+      (assoc :session nil)
+      (assoc :flash [:success "Successfully logged out."])))
