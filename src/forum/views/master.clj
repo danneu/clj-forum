@@ -33,7 +33,8 @@
       [:head
        [:title "clj-forum"]
        (include-css "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css")
-       (include-css "/css/bootstrap-override.css")]
+       (include-css "/css/bootstrap-override.css"
+                    "/css/forum.css")]
       [:body
 
        [:div.container

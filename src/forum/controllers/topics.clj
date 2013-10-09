@@ -1,5 +1,5 @@
 (ns forum.controllers.topics
-  (:require [forum.controllers.base :refer [load-base]]))
+  (:require [forum.controllers.base :refer :all]))
 (load-base)
 
 (defn show [fuid tuid]
@@ -18,17 +18,18 @@
                                   (sort-by :post/uid < posts)))))))
 
 (defn create [fuid topic-params]
-  (prn topic-params)
-  (when-let [forum (forum.db/find-forum-by-uid fuid)]
-    (when-let [user-uid (:user/uid *current-user*)]
-      (if-let [errors (forum.validation/topic-errors topic-params)]
-        (-> (redirect (url-for forum))
-            (assoc :flash [:danger (for [error errors]
-                                     [:li error])]))
-        (when-let [tuid (db/create-topic user-uid
-                                         fuid
-                                         (:title topic-params)
-                                         (:text topic-params))]
-          (-> (redirect (make-url "/forums/" fuid
-                                  "/topics/" tuid))
-              (assoc :flash [:success "Successfully created topic."])))))))
+  (if (cannot *current-user* :create :topic)
+    (redirect-unauthorized)
+    (when-let [forum (forum.db/find-forum-by-uid fuid)]
+      (when-let [user-uid (:user/uid *current-user*)]
+        (if-let [errors (forum.validation/topic-errors topic-params)]
+          (-> (redirect (url-for forum))
+              (assoc :flash [:danger (for [error errors]
+                                       [:li error])]))
+          (when-let [tuid (db/create-topic user-uid
+                                           fuid
+                                           (:title topic-params)
+                                           (:text topic-params))]
+            (-> (redirect (make-url "/forums/" fuid
+                                    "/topics/" tuid))
+                (assoc :flash [:success "Successfully created topic."]))))))))

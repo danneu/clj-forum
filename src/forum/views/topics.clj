@@ -2,29 +2,15 @@
   (:use [hiccup core element form util])
   (:require [forum.views.master :refer :all]
             [forum.views.posts]
+            [forum.cancan :refer :all]
+            [forum.middleware.wrap-current-user
+             :refer [*current-user*]]
             [forum.helpers :refer :all]))
 
 (defn show [forum topic posts]
   (html
    ;; Topic title
    [:h1 (:topic/title topic)]
-
-   [:style ".post .post-btn { padding: 0px 5px; }
-            .post.panel { margin-bottom: 5px; }
-            .post .panel-body { padding: 0 0 10px 0; }
-            .post .panel-heading { padding-top: 5px; padding-bottom: 0px; font-size: 12px; }
-            .post .panel-footer { padding-top: 5px; padding-bottom: 5px; }
-            .post .panel-heading { background-color: white; }
-            .post .panel-heading { border-bottom: 0; }"]
-   [:style ".post .panel-footer { border: 0; padding: 0; }"]
-   [:style ".post .post-meta a { color: #ccc; }"]
-   [:style ".post .poster-meta .uname { margin-bottom: 5px; }"]
-   [:style "
-            @media (min-width: 768px) {
-              .post .poster-meta .uname {
-                text-align: center;
-              }
-            } "]
 
    (for [post posts
          :let [[user] (:user/_posts post)]]
@@ -40,26 +26,16 @@
        [:div.col-sm-2.poster-meta
         [:div.uname
          (link-to  (url-for user) (:user/uname user))]
-        (image {:class "avatar hidden-xs"} "http://placehold.it/80x80/f2f2f2/666666")]
+        (image {:class "avatar hidden-xs"}
+               "http://placehold.it/80x80/f2f2f2/666666")]
        ;; Post text
        [:div.col-sm-10
         (:post/text post)]]
       [:div.panel-footer.clearfix
 
-
-       [:style ".nav.post-controls>li>a {
-                  padding: 0 5px;
-                  color: #999;
-                  font-size: 12px;
-                }"]
-       [:style ".nav.post-controls>li>a:hover {color: #333;}"]
-       [:style ".post-controls a .caret,
-                .post-controls a:hover .caret {
-                  border-bottom-color: black;
-                  border-top-color: #999;
-                }"]
        [:div.nav.nav-pills.pull-left.post-controls
-        [:li (link-to "/" [:span.glyphicon.glyphicon-exclamation-sign])]
+        [:li (link-to "/"
+                      [:span.glyphicon.glyphicon-exclamation-sign])]
         [:li.dropdown
          [:a.dropdown-toggle
           {:data-toggle "dropdown" :href "/"}
@@ -77,18 +53,14 @@
         [:li (link-to ;{:style "color: #FF82AB;"}
               "/"  [:span.glyphicon.glyphicon-heart]
               )]
-        [:li (link-to (url-for post "/edit") "Edit")]
+        (when (can *current-user* :edit post)
+          [:li (link-to (url-for post "/edit") "Edit")])
         [:li (link-to "/" "Reply")]
-        ]
-       
-       ;; [:div.btn-group.btn-group-sm.pull-right
-       ;;  [:button.btn.btn-default.post-btn.post-btn {:type ""} "Edit"]
-       ;;  [:button.btn.btn-default.post-btn.post-btn {:type "button"} "Quote"]
-       ;;  [:button.btn.btn-default.post-btn.post-btn {:type "button"} "Reply"]]
-       ]])
+        ]]])
 
    ;; New post form
-   [:h3 "New Post"]
-   (forum.views.posts/post-form :post (url-for topic "/posts"))
+   (when (can *current-user* :create :post)
+     [:h3 "New Post"]
+     (forum.views.posts/post-form :post (url-for topic "/posts")))
 
   ))

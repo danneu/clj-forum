@@ -1,0 +1,32 @@
+
+/* ----- Posts ----- */
+
+.post .post-btn { padding: 0px 5px; }
+.post.panel { margin-bottom: 5px; }
+.post .panel-body { padding: 0 0 10px 0; }
+.post .panel-heading { padding-top: 5px; padding-bottom: 0px; font-size: 12px; }
+.post .panel-footer { padding-top: 5px; padding-bottom: 5px; }
+.post .panel-heading { background-color: white; }
+.post .panel-heading { border-bottom: 0; }
+.post .panel-footer { border: 0; padding: 0; }
+.post .post-meta a { color: #ccc; }
+.post .poster-meta .uname { margin-bottom: 5px; }
+
+@media (min-width: 768px) {
+    .post .poster-meta .uname {
+        text-align: center;
+    }
+}
+.nav.post-controls>li>a {
+    padding: 0 5px;
+    color: #999;
+    font-size: 12px;
+}
+.nav.post-controls>li>a:hover {
+    color: #333;
+}
+.post-controls a .caret,
+.post-controls a:hover .caret {
+    border-bottom-color: black;
+    border-top-color: #999;
+}
