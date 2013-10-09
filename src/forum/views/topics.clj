@@ -53,7 +53,7 @@
         [:li (link-to ;{:style "color: #FF82AB;"}
               "/"  [:span.glyphicon.glyphicon-heart]
               )]
-        (when (can *current-user* :edit post)
+        (when (can *current-user* :update post)
           [:li (link-to (url-for post "/edit") "Edit")])
         [:li (link-to "/" "Reply")]
         ]]])
