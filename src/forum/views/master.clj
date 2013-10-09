@@ -1,7 +1,8 @@
 (ns forum.views.master
   (:use [hiccup core element form page util])
   (:require [forum.middleware.expose-request :refer [req]]
-            [forum.middleware.wrap-current-user :refer [current-user]]
+            [forum.middleware.wrap-current-user
+             :refer [*current-user*]]
             [forum.helpers :refer :all])
   (:import [java.io StringWriter]))
 
@@ -34,7 +35,7 @@
        (include-css "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css")
        (include-css "/css/bootstrap-override.css")]
       [:body
-       
+
        [:div.container
         [:nav.navbar.header
          ;; [:ul.nav.nav-pills.pull-right
@@ -44,8 +45,7 @@
          [:style ".badge-sm { padding: 1px 5px; }
                   .btn .badge-sm { top: 0; }"]
 
-         (if current-user
-           ;; If logged in
+         (if (logged-in? *current-user*)
            (list
             [:ul.nav.navbar-nav.pull-right
              [:li (link-to "/logout" "logout")]]
@@ -59,10 +59,10 @@
                       " "
                       [:span.badge.badge-sm "2"])
              (link-to {:class "btn btn-default navbar-btn"}
-                      (url-for current-user)
+                      (url-for *current-user*)
                       [:span.glyphicon.glyphicon-user]
                       " "
-                      (:user/uname current-user))
+                      (:user/uname *current-user*))
              ])
            ;; If logged out
            (list
@@ -83,8 +83,8 @@
             [:p.navbar-text.pull-right
              (link-to {:class "navbar-link"} "/users/new" "Register")
              " or"])
-           )  ; /if current-user
-         
+           )  ; /if *current-user*
+
          [:div.navbar-header
           [:h3 (link-to {:class "navbar-brand"} "/" "clj-forum")]]
          [:ul.nav.navbar-nav
@@ -99,7 +99,7 @@
 
         (render-flash)
 
-        view 
+        view
 
         [:div.footer.clearfix
          [:p.pull-right
@@ -134,7 +134,7 @@
        (include-js "//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js")
        (include-js "/js/debug.js")
        [:script {:type "text/javascript"} "$('.dropdown-toggle').dropdown();"]
-       
+
        ]  ;/body
 
       )))

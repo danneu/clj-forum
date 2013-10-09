@@ -2,14 +2,15 @@
   (:use [hiccup core form page element util])
   (:require [forum.views.master :refer :all]
             [forum.db]
+            [forum.cancan :refer :all]
             [forum.middleware.wrap-current-user
-             :refer [current-user]]
+             :refer [*current-user*]]
             [forum.helpers :refer :all]))
 
 (defn index [forums]
   (html
    ;; Jumbotron only should annoy guests on forumlist.
-   (when-not current-user
+   (when (guest? *current-user*)
      [:div.jumbotron
       [:h1 "clj-forum"]
       [:p.lead "Where thugs get it free and you've gotta be a G."]
@@ -37,7 +38,7 @@
 
    [:style ".topics .topic { padding: 5px 0; }"]
    [:style ".topics .topic.sticky { background-color: #f5f5f5; }"]
-   
+
    [:h2 (:forum/title forum)]
 
    [:div.list-group.topics

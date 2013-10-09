@@ -20,7 +20,7 @@
 (defn create [fuid topic-params]
   (prn topic-params)
   (when-let [forum (forum.db/find-forum-by-uid fuid)]
-    (when-let [user-uid (:user/uid current-user)]
+    (when-let [user-uid (:user/uid *current-user*)]
       (if-let [errors (forum.validation/topic-errors topic-params)]
         (-> (redirect (url-for forum))
             (assoc :flash [:danger (for [error errors]

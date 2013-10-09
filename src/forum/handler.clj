@@ -10,8 +10,10 @@
             [forum.controllers.topics]
             [forum.controllers.users]
             [forum.controllers.sessions]
-            [forum.middleware.expose-request :refer [expose-request req]]
-            [forum.middleware.wrap-current-user :refer [current-user wrap-current-user]]
+            [forum.middleware.expose-request
+             :refer [expose-request req]]
+            [forum.middleware.wrap-current-user
+             :refer [*current-user* wrap-current-user]]
             [hiccup.middleware :refer [wrap-base-url]]
             [ring.middleware.session.cookie :refer [cookie-store]]
             [ring.util.response :refer [redirect]]))

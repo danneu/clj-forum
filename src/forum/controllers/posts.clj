@@ -28,7 +28,7 @@
   ;; TODO: Add post validation
   (when-let [forum (forum.db/find-forum-by-uid fuid)]
     (when-let [topic (forum.db/find-topic-by-uid tuid)]
-      (when-let [user-uid (:user/uid current-user)]
+      (when-let [user-uid (:user/uid *current-user*)]
         (if-let [errors (forum.validation/post-errors post-params)]
           (-> (redirect (make-url "/forums/" fuid "/topics/" tuid))
               (assoc :flash [:danger (for [error errors]

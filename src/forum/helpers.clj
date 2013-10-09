@@ -42,13 +42,23 @@
   [topic]
   (last (sort-by :post/uid (:topic/posts topic))))
 
+(defn pretty-date
+  "Turn Date into string of 'about 10 minutes ago'."
+  [date]
+  (.format (PrettyTime.) date))
+
 (defn entity-type
   [entity]
   (cond
-   (:topic/uid entity) :topic
-   (:post/uid entity) :post
    (:forum/uid entity) :forum
-   (:user/uid entity) :user))
+   (:topic/uid entity) :topic
+   (:post/uid entity)  :post
+   (:user/uid entity)  :user
+   ;; For cancan so that :forum can represent any forum.
+   (= :forum entity) :forum
+   (= :topic entity) :topic
+   (= :post entity)  :post
+   (= :user entity)  :user))
 
 (defn creator
   [topic-or-post]
@@ -56,10 +66,11 @@
    :topic (first (:user/_topics topic-or-post))
    :post (first (:user/_posts topic-or-post))))
 
-(defn pretty-date
-  "Turn Date into string of 'about 10 minutes ago'."
-  [date]
-  (.format (PrettyTime.) date))
+(defn logged-in? [current-user]
+  (:user/uid current-user))
+
+(def logged-out?
+  (complement logged-in?))
 
 ;; URL resolution ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
