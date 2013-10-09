@@ -67,7 +67,7 @@
                   (:user/uname latest-creator))]
         (pretty-date (:post/created latest-post))]])]
 
-   (when (can *current-user* :create :topic)
+   (when (can? *current-user* :create :topic)
      ;; New topic form
      [:h3 "New Topic"]
      (form-to

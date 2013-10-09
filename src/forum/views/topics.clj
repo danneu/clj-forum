@@ -53,13 +53,13 @@
         [:li (link-to ;{:style "color: #FF82AB;"}
               "/"  [:span.glyphicon.glyphicon-heart]
               )]
-        (when (can *current-user* :update post)
+        (when (can? *current-user* :update post)
           [:li (link-to (url-for post "/edit") "Edit")])
         [:li (link-to "/" "Reply")]
         ]]])
 
    ;; New post form
-   (when (can *current-user* :create :post)
+   (when (can? *current-user* :create :post)
      [:h3 "New Post"]
      (forum.views.posts/post-form :post (url-for topic "/posts")))
 

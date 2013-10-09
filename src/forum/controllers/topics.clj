@@ -18,7 +18,7 @@
                                   (sort-by :post/uid < posts)))))))
 
 (defn create [fuid topic-params]
-  (if (cannot *current-user* :create :topic)
+  (if (cannot? *current-user* :create :topic)
     (redirect-unauthorized)
     (when-let [forum (forum.db/find-forum-by-uid fuid)]
       (when-let [user-uid (:user/uid *current-user*)]

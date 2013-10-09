@@ -52,9 +52,9 @@
 ;; :member --
 ;; :guest  --
 
-(defn can
+(defn can?
   "Returns true or false.
-   (can *current-user* :read entity)"
+   (can? *current-user* :read entity)"
   [user ability entity]
   (let [entity-type (entity-type entity)]
     (case (role user)
@@ -110,5 +110,5 @@
                :create false
                false))))
 
-(def cannot
-  (complement can))
+(def cannot?
+  (complement can?))

@@ -35,20 +35,20 @@
 ;; Posts    --     all  --     --
 
 ;; Forums
-(expect (cannot guest :create  :forum))
-(expect (can    guest :read    forum1))
-(expect (cannot guest :update  forum1))
-(expect (cannot guest :destroy forum1))
+(expect (cannot? guest :create  :forum))
+(expect (can?    guest :read    forum1))
+(expect (cannot? guest :update  forum1))
+(expect (cannot? guest :destroy forum1))
 ;; Topics
-(expect (cannot guest :create  :topic))
-(expect (can    guest :read    some-topic))
-(expect (cannot guest :update  some-topic))
-(expect (cannot guest :destroy some-topic))
+(expect (cannot? guest :create  :topic))
+(expect (can?    guest :read    some-topic))
+(expect (cannot? guest :update  some-topic))
+(expect (cannot? guest :destroy some-topic))
 ;; Posts
-(expect (cannot guest :create  :post))
-(expect (can    guest :read    some-post))
-(expect (cannot guest :update  some-post))
-(expect (cannot guest :destroy some-post))
+(expect (cannot? guest :create  :post))
+(expect (can?    guest :read    some-post))
+(expect (cannot? guest :update  some-post))
+(expect (cannot? guest :destroy some-post))
 
 ;; MOD      CREATE READ UPDATE DESTROY
 ;; Forums    --     all  --     --
@@ -56,21 +56,21 @@
 ;; Posts     all    all  own    all
 
 ;; Forums
-(expect (cannot mod1 :create  :forum))
-(expect (can    mod1 :read    forum1))
-(expect (cannot mod1 :update  forum1))
-(expect (cannot mod1 :destroy forum1))
+(expect (cannot? mod1 :create  :forum))
+(expect (can?    mod1 :read    forum1))
+(expect (cannot? mod1 :update  forum1))
+(expect (cannot? mod1 :destroy forum1))
 ;; Topics
-(expect (can    mod1 :create  :topic))
-(expect (can    mod1 :read    some-topic))
-(expect (can    mod1 :update  some-topic))
-(expect (can    mod1 :destroy some-topic))
+(expect (can?    mod1 :create  :topic))
+(expect (can?    mod1 :read    some-topic))
+(expect (can?    mod1 :update  some-topic))
+(expect (can?    mod1 :destroy some-topic))
 ;; Posts
-(expect (can    mod1 :create  :post))
-(expect (can    mod1 :read    some-post))
-(expect (cannot mod1 :update  some-post))
-(expect (can    mod1 :update  mod1-post))
-(expect (can    mod1 :destroy some-post))
+(expect (can?    mod1 :create  :post))
+(expect (can?    mod1 :read    some-post))
+(expect (cannot? mod1 :update  some-post))
+(expect (can?    mod1 :update  mod1-post))
+(expect (can?    mod1 :destroy some-post))
 
 ;; MEMBER    CREATE READ UPDATE DESTROY
 ;; Forums    --     all  --     --
@@ -78,24 +78,24 @@
 ;; Posts     all    all  own    all
 
 ;; Forums
-(expect (cannot member1 :create  :forum))
-(expect (can    member1 :read    forum1))
-(expect (cannot member1 :update  forum1))
-(expect (cannot member1 :destroy forum1))
+(expect (cannot? member1 :create  :forum))
+(expect (can?    member1 :read    forum1))
+(expect (cannot? member1 :update  forum1))
+(expect (cannot? member1 :destroy forum1))
 ;; Topics
-(expect (can    member1 :create  :topic))
-(expect (can    member1 :read    some-topic))
-(expect (cannot member1 :update  some-topic))
-(expect (cannot member1 :update  member1-topic))
-(expect (cannot member1 :destroy some-topic))
-(expect (cannot member1 :destroy member1-topic))
+(expect (can?    member1 :create  :topic))
+(expect (can?    member1 :read    some-topic))
+(expect (cannot? member1 :update  some-topic))
+(expect (cannot? member1 :update  member1-topic))
+(expect (cannot? member1 :destroy some-topic))
+(expect (cannot? member1 :destroy member1-topic))
 ;; Posts
-(expect (can    member1 :create  :post))
-(expect (can    member1 :read    some-post))
-(expect (cannot member1 :update  some-post))
-(expect (cannot member1 :update  member1-post))
-(expect (cannot member1 :destroy some-post))
-(expect (cannot member1 :destroy member1-post))
+(expect (can?    member1 :create  :post))
+(expect (can?    member1 :read    some-post))
+(expect (cannot? member1 :update  some-post))
+(expect (cannot? member1 :update  member1-post))
+(expect (cannot? member1 :destroy some-post))
+(expect (cannot? member1 :destroy member1-post))
 
 ;; USERS   BAN
 ;; :admin  mods, members
@@ -103,9 +103,9 @@
 ;; :member --
 ;; :guest  --
 
-(expect (can    admin   :ban member1))
-(expect (can    admin   :ban mod1))
-(expect (cannot mod1    :ban admin))
-(expect (can    mod1    :ban member1))
-(expect (cannot member1 :ban mod1))
-(expect (cannot guest   :ban member1))
+(expect (can?    admin   :ban member1))
+(expect (can?    admin   :ban mod1))
+(expect (cannot? mod1    :ban admin))
+(expect (can?    mod1    :ban member1))
+(expect (cannot? member1 :ban mod1))
+(expect (cannot? guest   :ban member1))

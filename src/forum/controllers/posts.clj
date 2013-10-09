@@ -7,7 +7,7 @@
   (when-let [forum (db/find-forum-by-uid fuid)]
     (when-let [topic (db/find-topic-by-uid tuid)]
       (when-let [post (db/find-post-by-uid puid)]
-        (if (cannot *current-user* :edit post)
+        (if (cannot? *current-user* :edit post)
           (redirect-unauthorized)
           (forum.views.master/layout
            {:crumbs [(link-to (url-for forum) (:forum/title forum))
@@ -18,7 +18,7 @@
 (defn update [puid {text :text}]
   ;; Do validation
   (when-let [post (db/find-post-by-uid puid)]
-    (if (cannot *current-user* :update post)
+    (if (cannot? *current-user* :update post)
       (redirect-unauthorized)
       ;; Due to my created-entity fn, update-post returns nil if
       ;; the update didn't actually change the text of the post.
@@ -32,7 +32,7 @@
 
 ;; post: {:text ""}
 (defn create [fuid tuid post-params]
-  (if (cannot *current-user* :create :post)
+  (if (cannot? *current-user* :create :post)
     (redirect-unauthorized)
     ;; TODO: Add post validation
     (when-let [forum (forum.db/find-forum-by-uid fuid)]
