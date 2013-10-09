@@ -1,6 +1,6 @@
 # clj-forum
 
-[Live Demo](http://198.58.119.43:3000/) (Running in development mode and probably not n*sync with this repo.)
+[Live Demo](http://198.58.119.43:3000/) (Might be offline) (Running in development mode and probably not n*sync with this repo.)
 
 - Database: Datomic
 - Templating: Hiccup
@@ -20,12 +20,14 @@ My goal as I progress is to figure out which abstractions, organization patterns
 - Run the transactor in its own terminal:
 
         bin/transactor -Xmx1g config/samples/free-transactor-template.properties
-    
+
 ### Start clj-forum
 
 - `git clone git@github.com:danneu/clj-forum.git`
 - `cd clj-forum`
 - `lein ring server`
+
+(Run tests with `lein autoexpect`)
 
 ## Implementation
 
@@ -55,6 +57,7 @@ User
 - :user/posts
 - :user/created - when user was created
 - :user/uid - unique id of user that's autoincremented on creation. the preferred lookup attribute.
+- :user/role - either :admin or :mod
 
 Forum
 
@@ -72,7 +75,7 @@ Topic
 
 The OP's post in a topic is simply the first post (sorted by uid ascending). A topic is just a titled collection of posts.
 
-Post 
+Post
 
 - :post/text
 - :post/uid
