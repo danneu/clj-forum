@@ -16,8 +16,8 @@
 (def member1-topic {:topic/uid 1, :user/_posts [member1]})
 (def member1-post  {:post/uid 1, :user/_posts [member1]})
 ;; Represent entities that don't belong to test subjects
-(def other-topic   {:topic/uid 42})
-(def other-post    {:post/uid 42})
+(def some-topic    {:topic/uid 42})
+(def some-post     {:post/uid 42})
 
 ;; Roles
 (expect :guest  (role {}))
@@ -41,14 +41,14 @@
 (expect (cannot guest :destroy forum1))
 ;; Topics
 (expect (cannot guest :create  :topic))
-(expect (can    guest :read    member1-topic))
-(expect (cannot guest :update  member1-topic))
-(expect (cannot guest :destroy member1-topic))
+(expect (can    guest :read    some-topic))
+(expect (cannot guest :update  some-topic))
+(expect (cannot guest :destroy some-topic))
 ;; Posts
 (expect (cannot guest :create  :post))
-(expect (can    guest :read    member1-post))
-(expect (cannot guest :update  member1-post))
-(expect (cannot guest :destroy member1-post))
+(expect (can    guest :read    some-post))
+(expect (cannot guest :update  some-post))
+(expect (cannot guest :destroy some-post))
 
 ;; MOD      CREATE READ UPDATE DESTROY
 ;; Forums    --     all  --     --
@@ -62,15 +62,15 @@
 (expect (cannot mod1 :destroy forum1))
 ;; Topics
 (expect (can    mod1 :create  :topic))
-(expect (can    mod1 :read    member1-topic))
-(expect (can    mod1 :update  member1-topic))
-(expect (can    mod1 :destroy member1-topic))
+(expect (can    mod1 :read    some-topic))
+(expect (can    mod1 :update  some-topic))
+(expect (can    mod1 :destroy some-topic))
 ;; Posts
 (expect (can    mod1 :create  :post))
-(expect (can    mod1 :read    member1-post))
-(expect (cannot mod1 :update  member1-post))
+(expect (can    mod1 :read    some-post))
+(expect (cannot mod1 :update  some-post))
 (expect (can    mod1 :update  mod1-post))
-(expect (can    mod1 :destroy member1-post))
+(expect (can    mod1 :destroy some-post))
 
 ;; MEMBER    CREATE READ UPDATE DESTROY
 ;; Forums    --     all  --     --
@@ -84,17 +84,17 @@
 (expect (cannot member1 :destroy forum1))
 ;; Topics
 (expect (can    member1 :create  :topic))
-(expect (can    member1 :read    other-topic))
-(expect (cannot member1 :update  other-topic))
+(expect (can    member1 :read    some-topic))
+(expect (cannot member1 :update  some-topic))
 (expect (cannot member1 :update  member1-topic))
-(expect (cannot member1 :destroy other-topic))
+(expect (cannot member1 :destroy some-topic))
 (expect (cannot member1 :destroy member1-topic))
 ;; Posts
 (expect (can    member1 :create  :post))
-(expect (can    member1 :read    other-post))
-(expect (cannot member1 :update  other-post))
+(expect (can    member1 :read    some-post))
+(expect (cannot member1 :update  some-post))
 (expect (cannot member1 :update  member1-post))
-(expect (cannot member1 :destroy other-post))
+(expect (cannot member1 :destroy some-post))
 (expect (cannot member1 :destroy member1-post))
 
 ;; USERS   BAN
