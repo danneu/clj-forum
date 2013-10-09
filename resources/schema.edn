@@ -4,7 +4,7 @@
  {:db/id #db/id[:db.part/db]
   :db/ident :forum/title
   :db/doc "A forum's title."
-  :db/valueType :db.type/string        
+  :db/valueType :db.type/string
   :db/cardinality :db.cardinality/one
   :db.install/_attribute :db.part/db}
  ;; :forum/topics many ref
@@ -35,14 +35,14 @@
  {:db/id #db/id[:db.part/db]
   :db/ident :topic/title
   :db/doc "A topic's title."
-  :db/valueType :db.type/string        
+  :db/valueType :db.type/string
   :db/cardinality :db.cardinality/one
   :db.install/_attribute :db.part/db}
  ;; :topic/posts many ref
  {:db/id #db/id[:db.part/db]
   :db/ident :topic/posts
   :db/doc "A topic's posts."
-  :db/valueType :db.type/ref        
+  :db/valueType :db.type/ref
   :db/cardinality :db.cardinality/many
   :db.install/_attribute :db.part/db}
  ;; :topic/created one instant
@@ -66,18 +66,18 @@
  {:db/id #db/id[:db.part/db]
   :db/ident :post/text
   :db/doc "A post's text body."
-  :db/valueType :db.type/string        
+  :db/valueType :db.type/string
   :db/cardinality :db.cardinality/one
   :db.install/_attribute :db.part/db}
  ;; :post/created one instant
- {:db/id #db/id[:db.part/db]   
+ {:db/id #db/id[:db.part/db]
   :db/ident :post/created
   :db/doc "When a post was created."
   :db/valueType :db.type/instant
   :db/cardinality :db.cardinality/one
   :db.install/_attribute :db.part/db}
  ;; :post/uid one long
- {:db/id #db/id[:db.part/db]   
+ {:db/id #db/id[:db.part/db]
   :db/ident :post/uid
   :db/unique :db.unique/identity
   :db/doc "A post's public ID."
@@ -87,30 +87,38 @@
 
 
  ;; User
- ;; :user/u one string
+ ;; :user/uname one string
  {:db/id #db/id[:db.part/db]
   :db/ident :user/uname
   :db/doc "A user's username."
   :db/unique :db.unique/value
-  :db/valueType :db.type/string        
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
+ ;; :user/email one string
+ {:db/id #db/id[:db.part/db]
+  :db/ident :user/email
+  :db/doc "A user's email."
+  :db/unique :db.unique/value
+  :db/valueType :db.type/string
   :db/cardinality :db.cardinality/one
   :db.install/_attribute :db.part/db}
  ;; :user/digest one string
  {:db/id #db/id[:db.part/db]
   :db/ident :user/digest
   :db/doc "A user's hashed password."
-  :db/valueType :db.type/string        
+  :db/valueType :db.type/string
   :db/cardinality :db.cardinality/one
   :db.install/_attribute :db.part/db}
  ;; :user/created one instant
- {:db/id #db/id[:db.part/db]   
+ {:db/id #db/id[:db.part/db]
   :db/ident :user/created
   :db/doc "When a user was created."
   :db/valueType :db.type/instant
   :db/cardinality :db.cardinality/one
   :db.install/_attribute :db.part/db}
  ;; :user/uid one long
- {:db/id #db/id[:db.part/db]   
+ {:db/id #db/id[:db.part/db]
   :db/ident :user/uid
   :db/unique :db.unique/identity
   :db/doc "A user's public ID."
@@ -118,14 +126,14 @@
   :db/cardinality :db.cardinality/one
   :db.install/_attribute :db.part/db}
  ;; :user/topics many ref
- {:db/id #db/id[:db.part/db]   
+ {:db/id #db/id[:db.part/db]
   :db/ident :user/topics
   :db/doc "A user's topics."
   :db/valueType :db.type/ref
   :db/cardinality :db.cardinality/many
   :db.install/_attribute :db.part/db}
  ;; :user/posts many ref
- {:db/id #db/id[:db.part/db]   
+ {:db/id #db/id[:db.part/db]
   :db/ident :user/posts
   :db/doc "A user's posts."
   :db/valueType :db.type/ref

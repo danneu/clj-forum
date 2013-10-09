@@ -89,7 +89,7 @@ resource that can be opened by io/reader."
 ;; Finders - Return one or many entities ;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; Forms:
-;; 
+;;
 ;; - find-all-X []
 ;; - find-X-by-Y [y]
 
@@ -135,11 +135,11 @@ resource that can be opened by io/reader."
 
 (defn create-user
   "Returns uid or nil."
-  [uname pwd]
+  [uname email pwd]
   (let [digest (forum.authentication/encrypt pwd)
         eid (tempid)
         result @(d/transact
-                 conn [[:user/construct eid uname digest]])]
+                 conn [[:user/construct eid uname email digest]])]
     (:user/uid (created-entity result :user/uname uname))))
 
 (defn create-forum
@@ -181,7 +181,25 @@ resource that can be opened by io/reader."
     ;; TODO: Change name of created-entity fn...
     (:post/uid (created-entity result :post/text text))))
 
-;; Seed the DB ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn update-user
+  "Return uid or nil.
+   Only give it the things that actually change.
+   {:user/email 'newemail@example.com'}
+   {:user/digest 'neWdIgEsT2ashf80hq3r'}"
+  [uid attrs]
+  (let [base-entity {:db/id (tempid)
+                     :user/uid (Long. uid)}
+        ;; Merge it with the only things that can change.
+        modified-entity (merge base-entity
+                               (select-keys attrs
+                                            [:user/uname
+                                             :user/email
+                                             :user/digest]))]
+    (let [result @(d/transact conn [modified-entity])]
+      (when result
+        (Long. uid)))))
+
+;; Seed the DB ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Noise generators
 
@@ -201,7 +219,7 @@ resource that can be opened by io/reader."
         (str _ ".")))
 
 (defn seed-db [conn topics-per-forum posts-per-topic]
-  (let [danneu-uid (create-user "danneu" "catdog")
+  (let [danneu-uid (create-user "danneu" "me@example.com" "secret")
         forums (for [[title desc]
                      [["Newbie Introductions"
                        "Are you new here? Then introduce yourself!"]

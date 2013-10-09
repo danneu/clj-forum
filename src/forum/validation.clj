@@ -36,9 +36,19 @@
   [user]
   (let [pwd (:pwd user)]
     (b/validate
-     user 
+     user
      :uname [[v/required :message "Username required"]
              valid-uname-length]
+     :pwd [[v/required :message "Password required"]
+           valid-pwd-length]
+     :confirm-pwd [[pwd-confirmed pwd]])))
+
+;; TODO figure out better way
+(defn validate-user-pwd
+  [user]
+  (let [pwd (:pwd user)]
+    (b/validate
+     user
      :pwd [[v/required :message "Password required"]
            valid-pwd-length]
      :confirm-pwd [[pwd-confirmed pwd]])))
@@ -82,6 +92,13 @@
   "Returns nil or a collection of error strings."
   [user-params]
   (let [[error-map] (validate-user user-params)]
+    (not-empty (flatten (vals error-map)))))
+
+;; TODO Figure out better way
+(defn user-pwd-errors
+  "Returns nil or a collection of error strings."
+  [user-params]
+  (let [[error-map] (validate-user-pwd user-params)]
     (not-empty (flatten (vals error-map)))))
 
 (defn topic-errors

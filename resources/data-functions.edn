@@ -18,7 +18,7 @@
   :db/ident :user/construct
   :db/fn #db/fn
   {:lang :clojure
-   :params [db eid uname digest]
+   :params [db eid uname email digest]
    :code
    (when-not
        (seq (d/q '[:find ?u
@@ -28,6 +28,7 @@
      (into
       [{:db/id eid
         :user/uname uname
+        :user/email email
         :user/digest digest
         :user/created (java.util.Date.)}]
       (datomic.api/invoke db :addUID db eid :user/uid)))}}
@@ -67,7 +68,7 @@
        :user/uid user-uid
        :user/posts peid}
       ])}}
- 
+
  ;; Topic constructor
  {:db/id #db/id[:db.part/user]
   :db/ident :topic/construct

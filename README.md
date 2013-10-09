@@ -80,3 +80,7 @@ Post
 - :post/text
 - :post/uid
 - :post/created
+
+## TODO
+
+- Add :user/email validation
