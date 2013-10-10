@@ -4,8 +4,8 @@
 
 (defn autolink [text]
   (str/replace text
-               #"(https?://[\S]+)"
-               "<a href='$1'>$1</a>"))
+               #"(https?://[^)]+)"
+               "<a href=\"$1\">$1</a>"))
 
 (defn escape [text]
   (str/join (for [c text]
