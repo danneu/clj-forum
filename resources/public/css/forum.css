@@ -37,3 +37,8 @@
 #post-preview {
     height: 15em;
 }
+
+#post-preview {
+    overflow: scroll;
+    resize: vertical;
+}

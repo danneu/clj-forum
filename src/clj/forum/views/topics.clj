@@ -70,6 +70,6 @@
       (form-to {:role "form"}
                [:post (url-for topic "/posts")]
         (forum.views.posts/post-text-area "post[text]")
-        (submit-button {:class "btn btn-default"} "Submit"))
+        (submit-button {:class "btn btn-primary"} "Submit"))
       ))
   ))

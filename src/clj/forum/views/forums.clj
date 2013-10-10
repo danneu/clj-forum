@@ -81,4 +81,4 @@
                      "topic[title]")]
         [:div.form-group
          (forum.views.posts/post-text-area "topic[text]")]
-        (submit-button {:class "btn btn-default"} "Submit"))))))
+        (submit-button {:class "btn btn-primary"} "Submit"))))))
