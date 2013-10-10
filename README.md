@@ -8,9 +8,9 @@ I'm figuring things out and yak-shaving as I go.
 
 Implemented/somewhat implemented:
 
-- Conventional forums <- topics <- posts relationship
+- Conventional forums <-- topics <-- posts relationship
 - Roles: `:admin`, `:mod`, `:member`, `:banned`, `:guest`
-- Avatars. Users are randomly generated one upon registratin (randomly-colored square)
+- Avatars. Users are randomly generated one upon registration (randomly-colored square)
 - Admin/mod/users share a single interface. http://gettingreal.37signals.com/ch09_One_Interface.php
 - Post permalinks
 - Debug toolbar. Ex: Shows the full `request` map
@@ -31,25 +31,25 @@ Planned:
 
 ![Homepage](http://i.imgur.com/s8Ezr7K.png)
 
----
+----
 
 #### Live Markdown preview:
 
 ![Markdown preview](http://i.imgur.com/jAHMN5A.png)
 
----
+----
 
 #### Moderator tools:
 
 ![Moderator tools](http://i.imgur.com/J9KPZXh.png)
 
----
+----
 
 #### Debug toolbar:
 
 ![Debug toolbar](http://i.imgur.com/dihATPA.png)
 
----
+----
 
 ## Running it
 
