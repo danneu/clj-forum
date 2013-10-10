@@ -22,11 +22,11 @@
     (for [forum forums]
       [:a.list-group-item {:href (url-for forum)}
        [:div.row
-        [:div.col-lg-8
+        [:div.col-xs-8
          [:h4.list-group-item-heading.forum-title
           (:forum/title forum)]
          [:p.list-group-item-text (:forum/desc forum)]]
-        [:div.col-lg-4.forum-meta
+        [:div.col-xs-4.forum-meta
          (str (count (:forum/topics forum)) " topics") [:br]
          (:posts-count forum) " posts"
          ]

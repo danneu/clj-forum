@@ -1,14 +1,46 @@
 # clj-forum
 
-[Live Demo](http://198.58.119.43:3000/) (Might be offline) (Running in development mode and probably not n*sync with this repo.)
+~~Live Demo~~ (Offline)
 
-- Database: Datomic
-- Templating: Hiccup
-- Routing: Compojure
+I'm figuring things out and yak-shaving as I go.
 
-I'm figuring things out as I go and leaning on Rails familiarities.
+## Features
 
-My goal as I progress is to figure out which abstractions, organization patterns, and strategies do and do not work.
+Implemented/somewhat implemented:
+
+- Conventional forums <- topics <- posts relationship
+- Roles: `:admin`, `:mod`, `:member`, `:banned`, `:guest`
+- Avatars. Users are randomly generated one upon registratin (randomly-colored square)
+- Admin/mod/users share a single interface. http://gettingreal.37signals.com/ch09_One_Interface.php
+- Post permalinks
+- Debug toolbar. Ex: Shows the full `request` map.
+
+Planned:
+
+- Private messages
+- Users able to "heart"/+1 posts
+- `@<Username>` mentions to summon a user
+- Notifications for new hearts, private messages, and `@mentions`
+- CSRF
+- "Report Post" button so users can notify admins/mods
+
+## Screenshots
+
+Homepage (Forum index):
+
+![Homepage](http://i.imgur.com/s8Ezr7K.png)
+
+Live Markdown preview:
+
+![Markdown preview](http://i.imgur.com/jAHMN5A.png)
+
+Moderator tools:
+
+![Moderator tools](http://i.imgur.com/J9KPZXh.png)
+
+Debug toolbar:
+
+![Debug toolbar](http://i.imgur.com/dihATPA.png)
 
 ## Running it
 
@@ -57,7 +89,7 @@ User
 - :user/posts
 - :user/created - when user was created
 - :user/uid - unique id of user that's autoincremented on creation. the preferred lookup attribute.
-- :user/role - either :admin or :mod
+- :user/role - either :admin or :mod (:member and :guest are not stored in the database. A :member is `{:user/uid _, ...}` without a given role. A :guest is a user with no :user/uid -- a user that's not saved in the database.)
 
 Forum
 
@@ -84,3 +116,4 @@ Post
 ## TODO
 
 - Add :user/email validation
+- Use form validation from https://github.com/brentonashworth/sandbar
