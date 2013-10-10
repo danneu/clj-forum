@@ -9,6 +9,7 @@
    [bouncer "0.3.0-alpha1"]  ; validation
    [hiccup "1.0.4"]  ; templating
    [ring "1.2.0"]
+   [net.mikera/imagez "0.1.0"]  ; create/manipulate images
    [org.jasypt/jasypt "1.9.1"]  ; password encryption
    [expectations "1.4.55"]  ; test framework
    ]

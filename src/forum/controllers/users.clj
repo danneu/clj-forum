@@ -1,6 +1,7 @@
 (ns forum.controllers.users
   (:require [forum.controllers.base :refer [load-base]]
-            [forum.authentication :refer [encrypt]]))
+            [forum.authentication :refer [encrypt]]
+            [forum.avatar]))
 (load-base)
 
 (defn index []
@@ -61,6 +62,7 @@
     (let [useruid (db/create-user (:uname user-params)
                                   (:email user-params)
                                   (:pwd user-params))]
+      (forum.avatar/create-and-write-avatar useruid)
       (-> (redirect "/users")
           (assoc :session {:user/uid useruid})
           (assoc :flash [:success "Successfully registered."])))))

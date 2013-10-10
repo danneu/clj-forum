@@ -27,7 +27,9 @@
         [:div.uname
          (link-to  (url-for user) (:user/uname user))]
         (image {:class "avatar hidden-xs"}
-               "http://placehold.it/80x80/f2f2f2/666666")]
+               (url-for user "/avatar")
+               ;"http://placehold.it/80x80/f2f2f2/666666"
+               )]
        ;; Post text
        [:div.col-sm-10
         (:post/text post)]]
@@ -60,7 +62,9 @@
 
    ;; New post form
    (when (can? *current-user* :create :post)
-     [:h3 "New Post"]
-     (forum.views.posts/post-form :post (url-for topic "/posts")))
+     (list
+      [:h3 "New Post"]
+      (forum.views.posts/post-form :post
+                                   (url-for topic "/posts"))))
 
   ))

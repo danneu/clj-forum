@@ -9,6 +9,7 @@
             [forum.controllers.posts]
             [forum.controllers.topics]
             [forum.controllers.users]
+            [forum.avatar :refer [avatar-response]]
             [forum.controllers.sessions]
             [forum.middleware.expose-request
              :refer [expose-request req]]
@@ -37,7 +38,9 @@
     (POST "/create" [user] (forum.controllers.users/create user))
     (PUT "/:uid" [uid user] (forum.controllers.users/update uid user))
     (GET "/:uid" [uid] (forum.controllers.users/show uid))
-    (GET "/:uid/edit" [uid] (forum.controllers.users/edit uid)))
+    (GET "/:uid/edit" [uid] (forum.controllers.users/edit uid))
+    (GET "/:uid/avatar" [uid] (avatar-response uid))
+    )
   (POST "/sessions/create" [uname pwd] (forum.controllers.sessions/create uname pwd))
   (GET "/logout" [] (forum.controllers.sessions/destroy))
   (route/resources "/")
