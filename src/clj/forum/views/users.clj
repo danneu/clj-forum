@@ -1,6 +1,12 @@
 (ns forum.views.users
-  (:use [hiccup core element form page util]
-        [forum.helpers]))
+  (:require [forum.helpers :refer [pretty-date url-for]]
+            [hiccup.core :refer [html]]
+            [hiccup.element :refer [image link-to]]
+            [hiccup.form :refer [form-to
+                                 label
+                                 submit-button
+                                 text-field]]
+            [ring.util.anti-forgery :refer [anti-forgery-field]]))
 
 (defn index [users]
   (html
@@ -60,6 +66,7 @@
        (text-field {:class "form-control"
                     :type "password"}
                    "user[confirm-pwd]")]
+      (anti-forgery-field)
       (submit-button {:class "btn btn-primary"} "Join Forum"))
     ]))
 
@@ -78,6 +85,7 @@
       (text-field {:class "form-control"}
                   "user[email]"
                   (:user/email user))]
+     (anti-forgery-field)
      (submit-button {:class "btn btn-default"}
                     "Change Email")
      )
@@ -93,5 +101,6 @@
       (label "user[new-confirm-pwd]" "Confirm new password:")
       (text-field {:class "form-control"}
                   "user[confirm-pwd]")]
+     (anti-forgery-field)
      (submit-button {:class "btn btn-default"} "Change Password")
      )))

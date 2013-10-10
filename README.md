@@ -4,6 +4,8 @@
 
 I'm figuring things out and yak-shaving as I go.
 
+(I'm particularly inexperienced with Datomic)
+
 ## Features
 
 Implemented/somewhat implemented:
@@ -15,6 +17,7 @@ Implemented/somewhat implemented:
 - Post permalinks
 - Debug toolbar. Ex: Shows the full `request` map
 - Live Markdown preview on New Topic and New Post forums (same Markdown parser on server and client)
+- CSRF protection
 
 Planned:
 
@@ -22,7 +25,6 @@ Planned:
 - Users able to "heart"/+1 posts
 - `@<Username>` mentions to summon a user
 - Notifications for new hearts, private messages, and `@mentions`
-- CSRF
 - "Report Post" button so users can notify admins/mods
 - Embedded BBCode for support for things like font colors and richer formatting
 

@@ -1,8 +1,6 @@
 (ns forum.helpers
-  (:use [hiccup core page form element util])
-  (:require [clojure.string :as str]
-            [hiccup.util :refer [*base-url*]])
-  (:import [org.ocpsoft.prettytime PrettyTime]))
+  (:require [clojure.string :as str] [hiccup.util :refer [*base-url*]])
+  (:import (org.ocpsoft.prettytime PrettyTime)))
 
 ;; AKA orphaned functions
 

@@ -2,22 +2,20 @@
   (:use [compojure.core]
         [clojure.pprint])
   (:require [ring.adapter.jetty :refer [run-jetty]]
+            [ring.middleware.anti-forgery
+             :refer [wrap-anti-forgery]]
             [clojure.java.io :as io]
+            [hiccup.middleware :refer [wrap-base-url]]
             [compojure.handler :as handler]
             [compojure.route :as route]
-            [forum.controllers.forums]
-            [forum.controllers.posts]
-            [forum.controllers.topics]
-            [forum.controllers.users]
+            [forum.controllers forums topics posts users sessions]
             [forum.avatar :refer [avatar-response]]
-            [forum.controllers.sessions]
             [forum.middleware.expose-request
              :refer [expose-request req]]
+            [ring.middleware.session.cookie :refer [cookie-store]]
             [forum.middleware.wrap-current-user
              :refer [*current-user* wrap-current-user]]
-            [hiccup.middleware :refer [wrap-base-url]]
-            [ring.middleware.session.cookie :refer [cookie-store]]
-            [ring.util.response :refer [redirect]]))
+            ))
 
 ;; - Controllers do all the DB calls and pass entities into Views.
 
@@ -42,7 +40,8 @@
     (GET "/:uid/avatar" [uid] (avatar-response uid))
     )
   (POST "/sessions/create" [uname pwd] (forum.controllers.sessions/create uname pwd))
-  (GET "/logout" [] (forum.controllers.sessions/destroy))
+  (DELETE "/logout" [] (forum.controllers.sessions/destroy))
+  ;(GET "/logout" [] (forum.controllers.sessions/destroy))
   (route/resources "/")
   (route/not-found "Not Found"))
 
@@ -63,6 +62,7 @@
   (-> app-routes
       ;; TODO: don't hardcode base-url like this.
       (wrap-base-url "http://localhost:3000")
+      wrap-anti-forgery
       expose-request
       wrap-current-user
       (handler/site {:session session-opts})))

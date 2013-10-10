@@ -1,8 +1,7 @@
 (ns forum.validation
-  (:require [clojure.string :as str]
-            [forum.db :as db]
-            [bouncer.core :as b]
-            [bouncer.validators :as v]))
+  (:require [bouncer.core :as b]
+            [bouncer.validators :as v]
+            [forum.db :as db]))
 
 ;; I guess stuff like missing user-uid and tuid should
 ;; be exceptions thrown by transactor?

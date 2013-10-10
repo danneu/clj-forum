@@ -1,10 +1,16 @@
 (ns forum.views.master
-  (:use [hiccup core element form page util])
-  (:require [forum.middleware.expose-request :refer [req]]
-            [forum.middleware.wrap-current-user
-             :refer [*current-user*]]
-            [forum.helpers :refer :all])
-  (:import [java.io StringWriter]))
+  (:require [forum.helpers :refer [logged-in? url-for]]
+            [forum.middleware.expose-request :refer [req]]
+            [forum.middleware.wrap-current-user :refer [*current-user*]]
+            [hiccup.core :refer [html]]
+            [hiccup.element :refer [image link-to]]
+            [hiccup.form :refer [form-to
+                                 password-field
+                                 submit-button
+                                 text-field]]
+            [hiccup.page :refer [html5 include-css include-js]]
+            [ring.util.anti-forgery :refer [anti-forgery-field]])
+  (:import (java.io StringWriter)))
 
 (defn render-crumbs [crumbs]
   (when crumbs
@@ -48,8 +54,11 @@
 
          (if (logged-in? *current-user*)
            (list
-            [:ul.nav.navbar-nav.pull-right
-             [:li (link-to "/logout" "logout")]]
+            ;; Logout button
+            (form-to {:class "navbar-form navbar-right"}
+              [:delete "/logout"]
+              (anti-forgery-field)
+              (submit-button {:class "btn btn-link"} "logout"))
             [:div.btn-group.pull-right.btn-group-sm
              (link-to {:class "btn btn-default navbar-btn"}
                       "/"
@@ -67,20 +76,22 @@
              ])
            ;; If logged out
            (list
-            (form-to
-                   {:class "navbar-form navbar-right"}
-                   [:post "/sessions/create"]
-                   [:div.form-group
-                    (text-field {:class "form-control input-sm"
-                                 :placeholder "Username"}
-                                "uname")]
-                   [:div.form-group
-                    (password-field {:class "form-control input-sm"
-                                     :placeholder "Password"}
-                                    "pwd")]
-                   (submit-button {:class "btn btn-primary btn-sm"}
-                                  "Log in"))
+            ;; Login form
+            (form-to {:class "navbar-form navbar-right"}
+                     [:post "/sessions/create"]
+              [:div.form-group
+               (text-field {:class "form-control input-sm"
+                            :placeholder "Username"}
+                           "uname")]
+              [:div.form-group
+               (password-field {:class "form-control input-sm"
+                                :placeholder "Password"}
+                               "pwd")]
+              (anti-forgery-field)
+              (submit-button {:class "btn btn-primary btn-sm"}
+                             "Log in"))
 
+            ;; Register link
             [:p.navbar-text.pull-right
              (link-to {:class "navbar-link"} "/users/new" "Register")
              " or"])

@@ -1,9 +1,8 @@
 (ns forum.avatar
-  (:require [mikera.image.core :refer :all]
-            [mikera.image.colours :refer :all]
+  (:require [mikera.image.colours :refer [rand-colour]]
+            [mikera.image.core :refer [new-image set-pixels]]
             [ring.util.response :refer [file-response]])
-  (:import [javax.imageio ImageIO]
-           [java.io File]))
+  (:import (java.io File) (javax.imageio ImageIO)))
 
 
 (defn random-image [x y]

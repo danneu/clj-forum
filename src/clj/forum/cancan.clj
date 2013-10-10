@@ -1,5 +1,5 @@
 (ns forum.cancan
-  (:require [forum.helpers :refer :all]))
+  (:require [forum.helpers :refer [creator entity-type]]))
 
 ;; Roles ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;

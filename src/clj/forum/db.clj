@@ -1,11 +1,8 @@
 (ns forum.db
-  (:require [datomic.api :as d]
-            [clojure.java.io :as io]
-            [clojure.pprint :refer [pprint]]
-            [forum.helpers :refer :all]
-            [forum.authentication])
-  (:import [datomic Util]
-           [java.util Date]))
+  (:require [clojure.java.io :as io]
+            [datomic.api :as d]
+            [datomic.crypto :refer [encrypt]])
+  (:import (datomic Util)))
 
 ;; Utils ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -136,7 +133,7 @@ resource that can be opened by io/reader."
 (defn create-user
   "Returns uid or nil."
   [uname email pwd]
-  (let [digest (forum.authentication/encrypt pwd)
+  (let [digest (encrypt pwd)
         eid (tempid)
         result @(d/transact
                  conn [[:user/construct eid uname email digest]])]

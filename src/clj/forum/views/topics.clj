@@ -1,12 +1,13 @@
 (ns forum.views.topics
-  (:use [hiccup core element form util])
-  (:require [forum.views.master :refer :all]
+  (:require [ring.util.anti-forgery :refer [anti-forgery-field]]
+            [forum.views.posts :refer [post-text-area]]
+            [forum.cancan :refer [can?]]
+            [forum.helpers :refer [first-post? pretty-date url-for]]
             [forum.markdown.render :refer [to-html]]
-            [forum.views.posts]
-            [forum.cancan :refer :all]
-            [forum.middleware.wrap-current-user
-             :refer [*current-user*]]
-            [forum.helpers :refer :all]))
+            [forum.middleware.wrap-current-user :refer [*current-user*]]
+            [hiccup.core :refer [html]]
+            [hiccup.element :refer [image link-to]]
+            [hiccup.form :refer [form-to submit-button]]))
 
 (defn show [forum topic posts]
   (html
@@ -69,7 +70,8 @@
       [:h3 "New Post"]
       (form-to {:role "form"}
                [:post (url-for topic "/posts")]
-        (forum.views.posts/post-text-area "post[text]")
+        (post-text-area "post[text]")
+        (anti-forgery-field)
         (submit-button {:class "btn btn-primary"} "Submit"))
       ))
   ))
