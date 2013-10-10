@@ -34,3 +34,7 @@
 (listen! (dom/by-id "post-markdown")
          :keyup
          render-post-preview!)
+
+(listen! (dom/by-id "post-preview")
+        :click
+        #(.focus (dom/by-id "post-markdown")))
