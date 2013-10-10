@@ -25,9 +25,14 @@
   (html
    [:h2.page-header (:user/uname user) " "
     [:small (link-to (url-for user "/edit") "Edit")]]
-   [:ul
-    [:li "Topics: " (count (:user/topics user))]
-    [:li "Posts: " (count (:user/posts user))]]))
+   [:div.row
+    [:div.col-sm-2
+     (image {:class "avatar img-rounded"}
+            (url-for user "/avatar"))]
+    [:div.col-sm-10
+     [:ul
+      [:li "Topics: " (count (:user/topics user))]
+      [:li "Posts: " (count (:user/posts user))]]]]))
 
 (defn new []
   (html

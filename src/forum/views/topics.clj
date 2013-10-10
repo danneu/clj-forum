@@ -26,10 +26,11 @@
        [:div.col-sm-2.poster-meta
         [:div.uname
          (link-to  (url-for user) (:user/uname user))]
-        (image {:class "avatar hidden-xs"}
-               (url-for user "/avatar")
-               ;"http://placehold.it/80x80/f2f2f2/666666"
-               )]
+        (link-to (url-for user)
+                 (image {:class "avatar hidden-xs img-rounded"}
+                        (url-for user "/avatar")
+                        ;"http://placehold.it/80x80/f2f2f2/666666"
+                        ))]
        ;; Post text
        [:div.col-sm-10
         (:post/text post)]]
