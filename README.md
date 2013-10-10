@@ -24,6 +24,7 @@ Planned:
 - Notifications for new hearts, private messages, and `@mentions`
 - CSRF
 - "Report Post" button so users can notify admins/mods
+- Embedded BBCode for support for things like font colors and richer formatting
 
 ## Screenshots
 
