@@ -13,7 +13,8 @@ Implemented/somewhat implemented:
 - Avatars. Users are randomly generated one upon registratin (randomly-colored square)
 - Admin/mod/users share a single interface. http://gettingreal.37signals.com/ch09_One_Interface.php
 - Post permalinks
-- Debug toolbar. Ex: Shows the full `request` map.
+- Debug toolbar. Ex: Shows the full `request` map
+- Live Markdown preview on New Topic and New Post forums (same Markdown parser on server and client)
 
 Planned:
 
@@ -26,21 +27,29 @@ Planned:
 
 ## Screenshots
 
-Homepage (Forum index):
+#### Homepage (Forum index):
 
 ![Homepage](http://i.imgur.com/s8Ezr7K.png)
 
-Live Markdown preview:
+---
+
+#### Live Markdown preview:
 
 ![Markdown preview](http://i.imgur.com/jAHMN5A.png)
 
-Moderator tools:
+---
+
+#### Moderator tools:
 
 ![Moderator tools](http://i.imgur.com/J9KPZXh.png)
 
-Debug toolbar:
+---
+
+#### Debug toolbar:
 
 ![Debug toolbar](http://i.imgur.com/dihATPA.png)
+
+---
 
 ## Running it
 
