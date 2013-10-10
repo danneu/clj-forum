@@ -8,12 +8,35 @@
    [org.ocpsoft.prettytime/prettytime "3.1.0.Final"]  ; formats Date -> "2 days ago"
    [bouncer "0.3.0-alpha1"]  ; validation
    [hiccup "1.0.4"]  ; templating
+   [markdown-clj "0.9.33"]
    [ring "1.2.0"]
    [net.mikera/imagez "0.1.0"]  ; create/manipulate images
    [org.jasypt/jasypt "1.9.1"]  ; password encryption
    [expectations "1.4.55"]  ; test framework
+
+   ;; cljs
+   [org.clojure/google-closure-library-third-party "0.0-2029"]
+   [domina "1.0.0"]
    ]
-  :plugins [[lein-ring "0.8.5"]]
+  :plugins [[lein-ring "0.8.5"]
+            [lein-cljsbuild "0.3.3"]]
+  :source-paths ["src/clj"]
   :ring {:handler forum.handler/app}
   :profiles
-  {:dev {:dependencies [[ring-mock "0.1.5"]]}})
+  {:dev {:dependencies [[ring-mock "0.1.5"]]}}
+
+  :cljsbuild
+  {:builds
+   [
+    {:source-paths ["src/cljs"]
+     :compiler {:output-to "resources/public/js/app.js"
+                :optimizations :simple
+                :pretty-print true}}
+    ;; {:source-paths ["src/cljs"]
+    ;;  :compiler {:output-to "resources/public/js/app.min.js"
+    ;;             :optimizations :advanced
+    ;;             :pretty-print false}}
+    ]
+   }
+
+  )

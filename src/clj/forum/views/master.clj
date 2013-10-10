@@ -135,6 +135,8 @@
        (include-js "//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js")
        (include-js "/js/debug.js")
        [:script {:type "text/javascript"} "$('.dropdown-toggle').dropdown();"]
+       ;(include-js "/js/app.min.js")
+       (include-js "/js/app.js")
 
        ]  ;/body
 

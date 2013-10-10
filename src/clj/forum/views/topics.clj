@@ -1,6 +1,7 @@
 (ns forum.views.topics
   (:use [hiccup core element form util])
   (:require [forum.views.master :refer :all]
+            [forum.markdown :refer [to-html]]
             [forum.views.posts]
             [forum.cancan :refer :all]
             [forum.middleware.wrap-current-user
@@ -33,7 +34,7 @@
                         ))]
        ;; Post text
        [:div.col-sm-10
-        (:post/text post)]]
+        (to-html (:post/text post))]]
       [:div.panel-footer.clearfix
 
        [:div.nav.nav-pills.pull-left.post-controls
@@ -66,6 +67,7 @@
      (list
       [:h3 "New Post"]
       (forum.views.posts/post-form :post
-                                   (url-for topic "/posts"))))
+                                   (url-for topic "/posts"))
+      [:div#post-preview]))
 
   ))

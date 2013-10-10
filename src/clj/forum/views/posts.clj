@@ -10,7 +10,8 @@
   ([method url post]
      (form-to {:role "form"} [method url]
        [:div.form-group
-        (text-area {:class "form-control"
+        (text-area {:id "post-markdown"
+                    :class "form-control"
                     :placeholder "Text"}
                    "post[text]"
                    (:post/text post))]
