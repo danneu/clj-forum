@@ -68,17 +68,18 @@
         (pretty-date (:post/created latest-post))]])]
 
    (when (can? *current-user* :create :topic)
-     ;; New topic form
-     [:h3 "New Topic"]
-     (form-to
-         {:role "form"}
-       [:post (str (url-for forum) "/topics")]
-       [:div.form-group
-        (text-field {:class "form-control"
-                     :placeholder "Title"}
-                    "topic[title]")]
-       [:div.form-group
-        (text-area {:class "form-control"
-                    :placeholder "Post"}
-                   "topic[text]")]
-       (submit-button {:class "btn btn-default"} "Submit")))))
+     (list
+      ;; New topic form
+      [:h3 "New Topic"]
+      (form-to
+          {:role "form"}
+        [:post (str (url-for forum) "/topics")]
+        [:div.form-group
+         (text-field {:class "form-control"
+                      :placeholder "Title"}
+                     "topic[title]")]
+        [:div.form-group
+         (text-area {:class "form-control"
+                     :placeholder "Post"}
+                    "topic[text]")]
+        (submit-button {:class "btn btn-default"} "Submit"))))))
