@@ -15,16 +15,17 @@
    [expectations "1.4.55"]  ; test framework
 
    ;; cljs
+   [org.clojure/clojurescript "0.0-1913"]
    [org.clojure/google-closure-library-third-party "0.0-2029"]
    [domina "1.0.0"]
    ]
   :plugins [[lein-ring "0.8.5"]
             [lein-cljsbuild "0.3.3"]]
   :source-paths ["src/clj"]
+  :hooks [leiningen.cljsbuild]
   :ring {:handler forum.handler/app}
   :profiles
   {:dev {:dependencies [[ring-mock "0.1.5"]]}}
-
   :cljsbuild
   {:builds
    [
