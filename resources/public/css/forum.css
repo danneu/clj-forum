@@ -30,3 +30,10 @@
     border-bottom-color: black;
     border-top-color: #999;
 }
+
+/* ----- Post textarea ----- */
+
+#post-markdown,
+#post-preview {
+    height: 15em;
+}

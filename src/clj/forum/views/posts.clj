@@ -32,6 +32,18 @@
 ;;         [:div#post-preview]]])))
 
 
+(defn post-text-area [text-area-name]
+  [:div.row
+   [:div.col-sm-6
+    "Text: "
+    (text-area {:id "post-markdown"
+                :class "form-control"}
+               text-area-name)]
+   [:div.col-sm-6
+    "Preview: "
+    [:div#post-preview.well
+     "&larr; Start writing!"
+     ]]])
 
 (defn post-form
   "`form-action` is same [method url] vector that
@@ -40,9 +52,6 @@
      (post-form method url {}))
   ([method url post]
      (list
-      [:style
-       "#post-markdown { height: 15em; }"
-       ]
       ;; Post form
       [:div.row
        [:div.col-sm-6

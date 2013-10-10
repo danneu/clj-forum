@@ -1,6 +1,7 @@
 (ns forum.views.forums
   (:use [hiccup core form page element util])
   (:require [forum.views.master :refer :all]
+            [forum.views.posts :refer [post-text-area]]
             [forum.db]
             [forum.cancan :refer :all]
             [forum.middleware.wrap-current-user
@@ -79,7 +80,5 @@
                       :placeholder "Title"}
                      "topic[title]")]
         [:div.form-group
-         (text-area {:class "form-control"
-                     :placeholder "Post"}
-                    "topic[text]")]
+         (forum.views.posts/post-text-area "topic[text]")]
         (submit-button {:class "btn btn-default"} "Submit"))))))

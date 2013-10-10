@@ -65,9 +65,11 @@
    ;; New post form
    (when (can? *current-user* :create :post)
      (list
-      [:h3 "New Post"]
-      (forum.views.posts/post-form :post
-                                   (url-for topic "/posts"))
-      [:div#post-preview]))
 
+      [:h3 "New Post"]
+      (form-to {:role "form"}
+               [:post (url-for topic "/posts")]
+        (forum.views.posts/post-text-area "post[text]")
+        (submit-button {:class "btn btn-default"} "Submit"))
+      ))
   ))
