@@ -1,7 +1,7 @@
 (ns forum.views.topics
   (:use [hiccup core element form util])
   (:require [forum.views.master :refer :all]
-            [forum.markdown :refer [to-html]]
+            [forum.markdown.render :refer [to-html]]
             [forum.views.posts]
             [forum.cancan :refer :all]
             [forum.middleware.wrap-current-user

@@ -26,8 +26,15 @@
   :ring {:handler forum.handler/app}
   :profiles
   {:dev {:dependencies [[ring-mock "0.1.5"]]}}
+
   :cljsbuild
-  {:builds
+  {
+   :crossovers [forum.markdown.transformers]
+   ;; clj files to be available in cljs are to be moved to
+   ;; src/crossover
+   ;; i.e. src/crossover/forum/markdown/transformers.cljs
+   :crossover-path "src/crossover"
+   :builds
    [
     {:source-paths ["src/cljs"]
      :compiler {:output-to "resources/public/js/app.js"

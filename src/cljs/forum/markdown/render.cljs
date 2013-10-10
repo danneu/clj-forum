@@ -3,29 +3,20 @@
             [domina :as dom :refer [log]]
             [markdown.transformers
              :refer [*next-line* *substring* transformer-vector]]
+            [forum.markdown.transformers
+             :refer [escape-transformer autolink-transformer]]
             [clojure.string :as str]
             [domina.events :refer [listen! target]]))
-
-;; TODO: Crossover this function
-(defn escape [text]
-  (str/join (for [c text]
-              (case c
-                \< "&lt;"
-                \> "&gt;"
-                \& "&amp;"
-                c))))
-
-;; TODO: Crossover this function
-(defn escape-transformer [text state]
-  [(escape text) state])
 
 (defn render-post-preview! []
   (let [rendered-post
         (-> (dom/by-id "post-markdown")
             (dom/value)
             ; (mdToHtml :custom-transformers [escape-transformer])
-            (mdToHtml :replacement-transformers (cons escape-transformer transformer-vector))
-            )]
+            (mdToHtml :replacement-transformers
+                      (concat [escape-transformer
+                               autolink-transformer]
+                              transformer-vector)))]
     (dom/set-html! (dom/by-id "post-preview")
                    (dom/html-to-dom (str "<div>"
                                          rendered-post
