@@ -31,10 +31,12 @@
                                          rendered-post
                                          "</div>")))))
 
-(listen! (dom/by-id "post-markdown")
-         :keyup
-         render-post-preview!)
-
-(listen! (dom/by-id "post-preview")
-        :click
-        #(.focus (dom/by-id "post-markdown")))
+;; Only render Markdown and attach listeners
+;; if there's something to render.
+(when (dom/by-id "post-markdown")
+  (listen! (dom/by-id "post-markdown") :keyup
+           render-post-preview!)
+  (listen! (dom/by-id "post-preview") :click
+           #(.focus (dom/by-id "post-markdown")))
+  (when (not-empty (dom/value (dom/by-id "post-markdown")))
+    (render-post-preview!)))
