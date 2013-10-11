@@ -53,3 +53,13 @@
                                  "/topics/" tuid
                                  "#post-" puid))
                   (assoc :flash [:success "Successfully posted."])))))))))
+
+(defn destroy [_ tuid uid]
+  (when-let [topic (db/find-topic-by-uid tuid)]
+    (when-let [post (db/find-post-by-uid uid)]
+      (if (cannot? *current-user* :destroy post)
+        (redirect-unauthorized)
+        (when (db/retract-post uid)
+          (-> (redirect (url-for topic))
+              (assoc :flash
+                [:success "Successfully deleted post."])))))))

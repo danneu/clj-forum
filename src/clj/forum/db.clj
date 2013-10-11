@@ -1,7 +1,9 @@
 (ns forum.db
-  (:require [clojure.java.io :as io]
+  (:require [clojure.string :as str]
+            [clojure.java.io :as io]
             [datomic.api :as d]
-            [datomic.crypto :refer [encrypt]])
+            [forum.helpers :refer [first-post?]]
+            [forum.authentication :refer [encrypt]])
   (:import (datomic Util)))
 
 ;; Utils ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -117,6 +119,20 @@ resource that can be opened by io/reader."
 (defn find-post-by-uid [uid]
   (find-by (d/db conn) :post/uid (Long. uid)))
 
+;; Retraction ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn retract-post
+  "Returns nil if nothing happened.
+   Can't retract the first post in a topic (Instead use
+   retract-topic."
+  [uid]
+  (when-let [post (find-post-by-uid uid)]
+    (assert (not (first-post? post)))
+    (let [result @(d/transact
+                   conn
+                   [[:db.fn/retractEntity (:db/id post)]])]
+      result)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; TODO: This is roundabout. Can I think of something better?
@@ -131,13 +147,32 @@ resource that can be opened by io/reader."
                                (:tx-data tx-result))))))
 
 (defn create-user
-  "Returns uid or nil."
-  [uname email pwd]
-  (let [digest (encrypt pwd)
-        eid (tempid)
-        result @(d/transact
-                 conn [[:user/construct eid uname email digest]])]
-    (:user/uid (created-entity result :user/uname uname))))
+  "Returns uid or nil.
+   {:uname _              Required
+    :email _              Required
+    :pwd _                Required
+    :role :admin or :mod  Optional"
+  [{:keys [uname email pwd role]}]
+  ;; (let [digest (encrypt pwd)
+  ;;       eid (tempid)
+  ;;       result @(d/transact
+  ;;                conn [[:user/construct eid uname email digest]])]
+  ;;   (:user/uid (created-entity result :user/uname uname))))
+  (when (not (find-user-by-uname uname))
+    (let [digest (encrypt pwd)
+          eid (tempid)
+          user-map (merge {:db/id eid
+                           :user/uname uname
+                           :user/email email
+                           :user/digest digest
+                           :user/created (java.util.Date.)}
+                          (when role
+                            {:user/role role}))]
+      (let [result @(d/transact
+                     conn
+                     [user-map
+                      [:addUID eid :user/uid]])]
+        (:user/uid (created-entity result :user/uname uname))))))
 
 (defn create-forum
   "Returns uid or nil."
@@ -215,46 +250,52 @@ resource that can be opened by io/reader."
         (clojure.string/capitalize _)
         (str _ ".")))
 
-(defn seed-db [conn topics-per-forum posts-per-topic]
-  (let [danneu-uid (create-user "danneu" "me@example.com" "secret")
-        forums (for [[title desc]
-                     [["Newbie Introductions"
-                       "Are you new here? Then introduce yourself!"]
-                      ["General Discussion"
-                       "Talk about whatever and just kick it."]
-                      ["Suggestions/Support"
-                       "Need help or have an idea to improve the place? Come share."]]]
-                 (create-forum title desc))
-        topics (flatten
-                (repeatedly
-                 topics-per-forum
-                 #(for [forum forums]
-                    (create-topic danneu-uid
-                                  forum
-                                  (generate-sentence)
-                                  (generate-sentence)))))]
-    (doseq [topic topics]
-      (dotimes [_ posts-per-topic]
-        (create-post
-         danneu-uid
-         topic
-         (clojure.string/join
-          " "
-          (take 3 (repeatedly generate-sentence))))))
-    conn))
+(defn generate-post-text []
+  (str/join  " " (repeatedly 3 generate-sentence)))
 
-;; Seed check ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn seed
-  "To be run from cli: lein run -m forum.db/seed"
-  []
+(defn seed2 []
   (d/release conn)
   (def conn (create-db))
-  (seed-db conn 5 5)
-  (let [posts (find-all-posts)]
-    (prn {:post-count (count posts)
-          :latest-post ((comp :post/created first) (sort-by :post/uid #(> %1 %2) (find-all-posts)))})
-    :done))
+  (let [user-uids (let [r [;; Admin
+                           (create-user {:uname "danneu" :email "me@example.com" :pwd "secret" :role :admin})
+                           ;; Moderator
+                           (create-user {:uname "Internet Moderator Tough Guy" :email "mod@example.com" :pwd "secret" :role :mod})
+                           ;; Regular member
+                           (create-user {:uname "Georgy Porgy" :email "porgy@example.com" :pwd "secret"})]]
+                    (println "user-uids: " r)
+                    r)
+        forum-uids (let [r [(create-forum
+                             "Newbie Introductions"
+                             "Are you new here? Then introduce yourself!")
+                            (create-forum
+                             "General Discussion"
+                             "Talk about whatever and just kick it.")
+                            (create-forum
+                             "Suggestions/Support"
+                             "Need help or have an idea to improve the place? Come share.")]]
+                     (println "forum-uids: " r)
+                     r)
+        topic-uids (let [r (flatten
+                            (for [forum-uid forum-uids]
+                              (repeatedly 10 #(create-topic (rand-nth user-uids)
+                                                            forum-uid
+                                                            (generate-sentence)
+                                                            (generate-sentence)))))]
+                     (println "topic-uids: " r)
+                     r)
+        post-uids (let [r (flatten
+                           (for [topic-uid topic-uids]
+                             (do
+                               (println "Topic uids: " topic-uids)
+                               (println "User uids: " user-uids)
+                               (repeatedly 10 #(create-post
+                                                (rand-nth user-uids)
+                                                topic-uid
+                                                (generate-post-text))))))]
+                    (println "post-uids: " r)
+                    r)]
+    (println "Topics created:" (count topic-uids) "\n"
+             "Posts created: " (count post-uids))))
 
 (defn forum-posts-count [feid]
   (let [result (d/q '[:find (count ?p)

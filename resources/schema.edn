@@ -139,4 +139,11 @@
   :db/valueType :db.type/ref
   :db/cardinality :db.cardinality/many
   :db.install/_attribute :db.part/db}
+ ;; :user/role one
+ {:db/id #db/id[:db.part/db]
+  :db/ident :user/role
+  :db/doc "A user's role (:admin or :mod)."
+  :db/valueType :db.type/keyword
+  :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
  ]

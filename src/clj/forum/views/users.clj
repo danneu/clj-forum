@@ -1,5 +1,6 @@
 (ns forum.views.users
   (:require [forum.helpers :refer [pretty-date url-for]]
+            [forum.cancan :refer [role]]
             [hiccup.core :refer [html]]
             [hiccup.element :refer [image link-to]]
             [hiccup.form :refer [form-to
@@ -37,6 +38,7 @@
             (url-for user "/avatar"))]
     [:div.col-sm-10
      [:ul
+      [:li "Role: " (role user)]
       [:li "Topics: " (count (:user/topics user))]
       [:li "Posts: " (count (:user/posts user))]]]]))
 

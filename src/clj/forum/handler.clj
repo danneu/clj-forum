@@ -28,8 +28,12 @@
       (GET "/" [] (forum.controllers.topics/show fuid tuid))
       (context "/posts" []
         (POST "/" [post] (forum.controllers.posts/create fuid tuid post))
-        (PUT "/:puid" [puid post] (forum.controllers.posts/update puid post))
-        (GET "/:puid/edit" [puid] (forum.controllers.posts/edit fuid tuid puid)))))
+        (DELETE "/:uid" [uid] (forum.controllers.posts/destroy
+                                fuid tuid uid))
+        (PUT "/:puid" [puid post] (forum.controllers.posts/update
+                                   puid post))
+        (GET "/:puid/edit" [puid] (forum.controllers.posts/edit
+                                   fuid tuid puid)))))
   (context "/users" []
     (GET "/" [] (forum.controllers.users/index))
     (GET "/new" [] (forum.controllers.users/new))

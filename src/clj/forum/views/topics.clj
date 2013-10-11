@@ -1,8 +1,12 @@
 (ns forum.views.topics
-  (:require [ring.util.anti-forgery :refer [anti-forgery-field]]
+  (:require [clojure.string :as str]
+            [ring.util.anti-forgery :refer [anti-forgery-field]]
             [forum.views.posts :refer [post-text-area]]
-            [forum.cancan :refer [can?]]
-            [forum.helpers :refer [first-post? pretty-date url-for]]
+            [forum.cancan :refer [can? role]]
+            [forum.helpers :refer [first-post?
+                                   pretty-date
+                                   url-for
+                                   logged-in?]]
             [forum.markdown.render :refer [to-html]]
             [forum.middleware.wrap-current-user :refer [*current-user*]]
             [hiccup.core :refer [html]]
@@ -26,33 +30,41 @@
       [:div.panel-body
        ;; Post info
        [:div.col-sm-2.poster-meta
+
         [:div.uname
          (link-to  (url-for user) (:user/uname user))]
         (link-to (url-for user)
                  (image {:class "avatar hidden-xs img-rounded"}
                         (url-for user "/avatar")
                         ;"http://placehold.it/80x80/f2f2f2/666666"
-                        ))]
+                        ))
+        [:p {:style "text-align: center;"} (str/capitalize (name (role user)))]
+        ]
        ;; Post text
        [:div.col-sm-10
         (to-html (:post/text post))]]
       [:div.panel-footer.clearfix
 
-       [:div.nav.nav-pills.pull-left.post-controls
-        [:li (link-to "/"
-                      [:span.glyphicon.glyphicon-exclamation-sign])]
-        [:li.dropdown
-         [:a.dropdown-toggle
-          {:data-toggle "dropdown" :href "/"}
-          "Moderate " [:span.caret]]
-         [:ul.dropdown-menu
-          (if (first-post? post)
-            (list [:li (link-to "/" "Stick")]
-                  [:li (link-to "/" "Lock")]
-                  [:li (link-to "/" "Delete")])
-            (list [:li (link-to "/" "Delete")]))
-          ]]
-        ]
+       (if (logged-in? *current-user*)
+         (list
+          [:div.nav.nav-pills.pull-left.post-controls
+           [:li (link-to "/"
+                         [:span.glyphicon.glyphicon-exclamation-sign])]
+           [:li.dropdown
+            [:a.dropdown-toggle
+             {:data-toggle "dropdown" :href "/"}
+             "Moderate " [:span.caret]]
+            [:ul.dropdown-menu
+             (if (first-post? post)
+               (list [:li (link-to "/" "Stick Topic")]
+                     [:li (link-to "/" "Lock Topic")]
+                     [:li (link-to "/" "Delete Topic")])
+               (list [:li (form-to [:delete (url-for post)]
+                            (anti-forgery-field)
+                            (submit-button {:class "btn btn-link"}
+                                           "Delete Post"))]))
+             ]]
+           ]))
 
        [:div.nav.nav-pills.pull-right.post-controls
         [:li (link-to ;{:style "color: #FF82AB;"}
