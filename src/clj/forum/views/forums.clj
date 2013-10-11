@@ -55,10 +55,16 @@
        [:div.col-sm-9
         [:div.topic-title
          (link-to (url-for topic) (:topic/title topic))]
+
+        ;; Topic creator
+        [:style
+         ".topic-creator { color: #888; }
+          .topic-creator a { color: #555; }"]
         [:div.topic-creator
-         "by " (link-to (url-for user) (:user/uname user))
-         ", "
-         (pretty-date (:topic/created topic))]]
+         "Started " (pretty-date (:topic/created topic))
+         " by " (link-to (url-for user) (:user/uname user))
+         ]]
+
        ;; Latest post
        [:div.col-sm-3
         [:div

@@ -4,10 +4,11 @@
             [ring.util.response :refer [file-response]])
   (:import (java.io File) (javax.imageio ImageIO)))
 
-
-(defn random-image [x y]
-  (let [img (new-image x y)
-        color-pixels (int-array (* x y) (rand-colour))]
+(defn random-image
+  "Creates a width by height unsaved image of a random color."
+  [width height]
+  (let [img (new-image width height)
+        color-pixels (int-array (* width height) (rand-colour))]
     (set-pixels img color-pixels)
     img))
 
