@@ -1,4 +1,9 @@
 {
  ;; Must be at least 16 bytes.
  :session-secret "abcdefghijklmnop"
+
+ ;; ReCaptcha
+ :recaptcha {:enabled? false
+             :public-key "XXX"
+             :private-key "YYY"}
 }

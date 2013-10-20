@@ -1,6 +1,7 @@
 (ns forum.controllers.users
   (:require [forum.controllers.base :refer :all]
             [forum.authentication :refer [encrypt]]
+            [forum.recaptcha :as recaptcha]
             [forum.avatar]))
 
 (load-base-controller)
@@ -54,16 +55,34 @@
       (when (db/update-user uid new-attrs)
         (redirect (url-for user))))))
 
-(defn create [user-params]
-  (if-let [errors (forum.validation/user-errors user-params)]
-    (assoc (redirect "/users/new")
-           :flash
-           [:danger (for [error errors]
-                      [:li error])])
-    (let [useruid (db/create-user (:uname user-params)
-                                  (:email user-params)
-                                  (:pwd user-params))]
-      (forum.avatar/create-and-write-avatar useruid)
-      (-> (redirect "/users")
-          (assoc :session {:user/uid useruid})
-          (assoc :flash [:success "Successfully registered."])))))
+(defn create [params]
+  ;; TODO: Should I check if recaptcha is :enabled? manually here
+  ;;       or should I let the recaptcha module do that? Perhaps
+  ;;       it's misleading to have this recaptcha in the code path
+  ;;       even though it's not actually getting checked.
+  ;; First check recaptcha
+  (println params)
+  (let [recaptcha-verification
+        (recaptcha/send-verify-request
+         {:challenge (:recaptcha_challenge_field params)
+          :user-input (:recaptcha_response_field params)})]
+    (if-not (:status recaptcha-verification)
+      ;; Recaptcha invalid
+      (-> (redirect "/users/new")
+          (assoc :flash [:danger (str "Invalid captcha: "
+                                      (:error-code recaptcha-verification))]))
+      ;; Recaptcha valid
+      (let [user-params (:user params)]
+        (if-let [errors (forum.validation/user-errors user-params)]
+          (assoc (redirect "/users/new")
+            :flash
+            [:danger (for [error errors]
+                       [:li error])])
+          (let [useruid (db/create-user
+                         {:uname (:uname user-params)
+                          :email (:email user-params)
+                          :pwd (:pwd user-params)})]
+            (forum.avatar/create-and-write-avatar useruid)
+            (-> (redirect "/users")
+                (assoc :session {:user/uid useruid})
+                (assoc :flash [:success "Successfully registered."]))))))))

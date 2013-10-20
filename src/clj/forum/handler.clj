@@ -12,6 +12,7 @@
             [forum.avatar :refer [avatar-response]]
             [forum.middleware.expose-request
              :refer [expose-request req]]
+            [forum.config :as config]
             [ring.middleware.session.cookie :refer [cookie-store]]
             [forum.middleware.wrap-current-user
              :refer [*current-user* wrap-current-user]]
@@ -37,7 +38,7 @@
   (context "/users" []
     (GET "/" [] (forum.controllers.users/index))
     (GET "/new" [] (forum.controllers.users/new))
-    (POST "/create" [user] (forum.controllers.users/create user))
+    (POST "/create" {params :params} (forum.controllers.users/create params))
     (PUT "/:uid" [uid user] (forum.controllers.users/update uid user))
     (GET "/:uid" [uid] (forum.controllers.users/show uid))
     (GET "/:uid/edit" [uid] (forum.controllers.users/edit uid))
@@ -49,18 +50,12 @@
   (route/resources "/")
   (route/not-found "Not Found"))
 
-;; Config ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(def config
-  ;; {:session-secret String}
-  (read-string (slurp (io/resource "config.edn"))))
+;; Middleware ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Store session in cookie that's encrypted
 ;; with AES key defined as :session-secret config.edn.
 (def session-opts
-  {:store (cookie-store {:key (:session-secret config)})})
-
-;; Middleware ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  {:store (cookie-store {:key config/session-secret})})
 
 (def app
   (-> app-routes

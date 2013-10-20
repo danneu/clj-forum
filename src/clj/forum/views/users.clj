@@ -1,5 +1,6 @@
 (ns forum.views.users
-  (:require [forum.views.base :refer [load-base-view]]))
+  (:require [forum.views.base :refer [load-base-view]]
+            [forum.recaptcha :as recaptcha]))
 
 (load-base-view)
 
@@ -63,6 +64,8 @@
                     :type "password"}
                    "user[confirm-pwd]")]
       (anti-forgery-field)
+      (recaptcha/recaptcha-input-html)
+
       (submit-button {:class "btn btn-primary"} "Join Forum"))
     ]))
 

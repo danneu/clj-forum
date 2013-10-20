@@ -1,5 +1,6 @@
 (ns forum.db
   (:require [clojure.string :as str]
+            [clojure.pprint :refer [pprint]]
             [clojure.java.io :as io]
             [datomic.api :as d]
             [forum.models :refer :all]
@@ -108,10 +109,12 @@ resource that can be opened by io/reader."
   (find-by (d/db conn) :forum/uid (Long. uid)))
 
 (defn find-user-by-uid [uid]
-  (wrap-user (find-by (d/db conn) :user/uid (Long. uid))))
+  (when-let [entity (find-by (d/db conn) :user/uid (Long. uid))]
+    (wrap-user entity)))
 
 (defn find-user-by-uname [uname]
-  (wrap-user (find-by (d/db conn) :user/uname uname)))
+  (when-let [entity (find-by (d/db conn) :user/uname uname)]
+    (wrap-user entity)))
 
 (defn find-topic-by-uid [uid]
   (find-by (d/db conn) :topic/uid (Long. uid)))
@@ -152,13 +155,14 @@ resource that can be opened by io/reader."
     :email _              Required
     :pwd _                Required
     :role :admin or :mod  Optional"
-  [{:keys [uname email pwd role]}]
+  [{:keys [uname email pwd role] :as user}]
   ;; (let [digest (encrypt pwd)
   ;;       eid (tempid)
   ;;       result @(d/transact
   ;;                conn [[:user/construct eid uname email digest]])]
   ;;   (:user/uid (created-entity result :user/uname uname))))
-  (when (not (find-user-by-uname uname))
+  (if (find-user-by-uname uname)
+    (ex-info "TODO: Handle this case.")
     (let [digest (encrypt pwd)
           eid (tempid)
           user-map (merge {:db/id eid
