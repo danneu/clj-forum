@@ -1,6 +1,7 @@
 (ns forum.cancan-test
   (:require [forum.cancan :refer :all]
             [forum.helpers :refer :all]
+            [forum.models :refer :all]
             [expectations :refer :all]))
 
 ;; Keep in sync with cancan.clj
