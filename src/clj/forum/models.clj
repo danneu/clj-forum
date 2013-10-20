@@ -103,9 +103,11 @@
 
 ;; Decoration ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; IDEA: Presenter getters like this could pull values of out
+;;       an entity map and wrap it with spans/classes for styling.
 (defn decorated-uname
   "(decorated-uname {:user/uname 'danneu'})
    -> <span class='decor member'>danneu</span>"
   [user]
-  [:span {:class ["decor" (name (role user))]}
+  [:span {:class (str "decor" " " (name (role user)))}
    (:user/uname user)])

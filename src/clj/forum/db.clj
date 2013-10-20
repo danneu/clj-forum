@@ -2,7 +2,7 @@
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
             [datomic.api :as d]
-            [forum.helpers :refer [first-post?]]
+            [forum.models :refer :all]
             [forum.authentication :refer [encrypt]])
   (:import (datomic Util)))
 
@@ -96,7 +96,7 @@ resource that can be opened by io/reader."
   (flatten (find-all-by (d/db conn) :forum/uid)))
 
 (defn find-all-users []
-  (flatten (find-all-by (d/db conn) :user/uid)))
+  (map wrap-user (flatten (find-all-by (d/db conn) :user/uid))))
 
 (defn find-all-topics []
   (flatten (find-all-by (d/db conn) :topic/uid)))
@@ -108,10 +108,10 @@ resource that can be opened by io/reader."
   (find-by (d/db conn) :forum/uid (Long. uid)))
 
 (defn find-user-by-uid [uid]
-  (find-by (d/db conn) :user/uid (Long. uid)))
+  (wrap-user (find-by (d/db conn) :user/uid (Long. uid))))
 
 (defn find-user-by-uname [uname]
-  (find-by (d/db conn) :user/uname uname))
+  (wrap-user (find-by (d/db conn) :user/uname uname)))
 
 (defn find-topic-by-uid [uid]
   (find-by (d/db conn) :topic/uid (Long. uid)))

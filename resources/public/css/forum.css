@@ -42,3 +42,14 @@
     overflow: scroll;
     resize: vertical;
 }
+
+/* ----- User decorations ------ */
+/* See forum.models/decorated-uname */
+
+/* .decor.admin { */
+/*     font-weight: bold; */
+/* } */
+
+/* .decor.mod { */
+/*     font-weight: bold; */
+/* } */
