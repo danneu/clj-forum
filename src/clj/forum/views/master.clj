@@ -30,7 +30,9 @@
      (html5
       [:head
        [:title "clj-forum"]
+       ;; TODO fallback to local bootstrap
        (include-css "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css")
+       ;; (include-css "/css/bootstrap.min.css")
        (include-css "/css/bootstrap-override.css"
                     "/css/forum.css")]
       [:body
@@ -134,7 +136,9 @@
 
         ] ;/container
 
+       ;; TODO: fallback to local jquery
        (include-js "//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js")
+       ;; (include-js "/js/jquery.min.js" "/js/bootstrap.min.js")
        (include-js "//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js")
        (include-js "/js/debug.js")
        [:script {:type "text/javascript"} "$('.dropdown-toggle').dropdown();"]
