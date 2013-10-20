@@ -1,8 +1,7 @@
 (ns forum.views.posts
-  (:require [forum.helpers :refer [url-for]]
-            [hiccup.core :refer [html]]
-            [hiccup.form :refer [form-to submit-button text-area]]
-            [ring.util.anti-forgery :refer [anti-forgery-field]]))
+  (:require [forum.views.base :refer [load-base-view]]))
+
+(load-base-view)
 
 (defn post-text-area [text-area-name & [text]]
   [:div.row

@@ -1,28 +1,10 @@
 (ns forum.cancan
-  (:require [forum.helpers :refer [creator entity-type]]))
+  (:require [forum.models :refer :all]))
 
-;; Roles ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;; 1. :guest  - {}
-;; 2. :member - {:user/uid _}
-;; 3. :mod    - {:user/role :mod}
-;; 4. :admin  - {:user/role :admin}
-(defn role
-  "If user has given :user/role, then return that.
-   Else, if user has a :user/uid, then return :member.
-   Else, return :guest."
-  [{role :user/role uid :user/uid}]
-  (cond
-   role role
-   uid :member
-   :else :guest))
-
-;; Abilities
-
-(defn admin?  [user] (= :admin  (role user)))
-(defn mod?    [user] (= :mod    (role user)))
-(defn member? [user] (= :member (role user)))
-(defn guest?  [user] (= :guest  (role user)))
+;; Only things that should require cancan
+;; (i.e. only things that need perission-checking):
+;; - controllers
+;; - views
 
 ;; Keep in sync with cancan_test.clj
 

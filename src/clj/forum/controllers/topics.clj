@@ -1,6 +1,7 @@
 (ns forum.controllers.topics
   (:require [forum.controllers.base :refer :all]))
-(load-base)
+
+(load-base-controller)
 
 (defn show [fuid tuid]
   (when-let [forum (forum.db/find-forum-by-uid fuid)]

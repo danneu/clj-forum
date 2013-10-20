@@ -1,7 +1,7 @@
 (ns forum.controllers.posts
   (:require [forum.controllers.base :refer :all]))
 
-(load-base)
+(load-base-controller)
 
 (defn edit [fuid tuid puid]
   (when-let [forum (db/find-forum-by-uid fuid)]

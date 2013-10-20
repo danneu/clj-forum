@@ -1,16 +1,8 @@
 (ns forum.views.master
-  (:require [forum.helpers :refer [logged-in? url-for]]
-            [forum.middleware.expose-request :refer [req]]
-            [forum.middleware.wrap-current-user :refer [*current-user*]]
-            [hiccup.core :refer [html]]
-            [hiccup.element :refer [image link-to]]
-            [hiccup.form :refer [form-to
-                                 password-field
-                                 submit-button
-                                 text-field]]
-            [hiccup.page :refer [html5 include-css include-js]]
-            [ring.util.anti-forgery :refer [anti-forgery-field]])
+  (:require [forum.views.base :refer [load-base-view]])
   (:import (java.io StringWriter)))
+
+(load-base-view)
 
 (defn render-crumbs [crumbs]
   (when crumbs
@@ -58,7 +50,7 @@
             (form-to {:class "navbar-form navbar-right"}
               [:delete "/logout"]
               (anti-forgery-field)
-              (submit-button {:class "btn btn-link"} "logout"))
+              (submit-button {:class "btn btn-link"} "Logout"))
             [:div.btn-group.pull-right.btn-group-sm
              (link-to {:class "btn btn-default navbar-btn"}
                       "/"

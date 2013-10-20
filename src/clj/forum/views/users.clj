@@ -1,13 +1,7 @@
 (ns forum.views.users
-  (:require [forum.helpers :refer [pretty-date url-for]]
-            [forum.cancan :refer [role]]
-            [hiccup.core :refer [html]]
-            [hiccup.element :refer [image link-to]]
-            [hiccup.form :refer [form-to
-                                 label
-                                 submit-button
-                                 text-field]]
-            [ring.util.anti-forgery :refer [anti-forgery-field]]))
+  (:require [forum.views.base :refer [load-base-view]]))
+
+(load-base-view)
 
 (defn index [users]
   (html

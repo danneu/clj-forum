@@ -1,6 +1,7 @@
 (ns forum.controllers.forums
-  (:require [forum.controllers.base :refer [load-base]]))
-(load-base)
+  (:require [forum.controllers.base :refer :all]))
+
+(load-base-controller)
 
 ;; TODO: Should in presenter or something
 (defn assoc-posts-count [forum]

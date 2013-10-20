@@ -1,8 +1,9 @@
 (ns forum.controllers.users
-  (:require [forum.controllers.base :refer [load-base]]
+  (:require [forum.controllers.base :refer :all]
             [forum.authentication :refer [encrypt]]
             [forum.avatar]))
-(load-base)
+
+(load-base-controller)
 
 (defn index []
   (let [users (db/find-all-users)]

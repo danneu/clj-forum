@@ -1,6 +1,14 @@
 (ns forum.controllers.base)
 
-(defmacro load-base []
+;; TODO: Better way to do something like this?
+
+;; This is the standard view stack that every controller can
+;; expect to have. Preferably references will be added
+;; here unless they truly are ad-hoc and unique to one controller.
+;;
+;; For views, there is forum.views.base
+
+(defmacro load-base-controller []
   `(do
      (use '[hiccup.core]
           '[hiccup.element]
@@ -11,6 +19,7 @@
       '[clojure.string :as ~'str]
       '[forum.db :as ~'db]
       '[forum.views ~'forums ~'master ~'posts ~'topics ~'users]
+      '[forum.models :refer :all]
       '[forum.helpers :refer :all]
       '[forum.validation]
       '[forum.cancan :refer :all]
@@ -18,7 +27,7 @@
       '[forum.middleware.wrap-current-user
         :refer [~'*current-user*]])))
 
-(load-base)
+(load-base-controller)
 
 (defn redirect-unauthorized []
   (-> (redirect "/")

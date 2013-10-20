@@ -1,17 +1,7 @@
 (ns forum.views.topics
-  (:require [clojure.string :as str]
-            [ring.util.anti-forgery :refer [anti-forgery-field]]
-            [forum.views.posts :refer [post-text-area]]
-            [forum.cancan :refer [can? role]]
-            [forum.helpers :refer [first-post?
-                                   pretty-date
-                                   url-for
-                                   logged-in?]]
-            [forum.markdown.render :refer [to-html]]
-            [forum.middleware.wrap-current-user :refer [*current-user*]]
-            [hiccup.core :refer [html]]
-            [hiccup.element :refer [image link-to]]
-            [hiccup.form :refer [form-to submit-button]]))
+  (:require [forum.views.base :refer [load-base-view]]))
+
+(load-base-view)
 
 (defn show [forum topic posts]
   (html
@@ -82,7 +72,7 @@
       [:h3 "New Post"]
       (form-to {:role "form"}
                [:post (url-for topic "/posts")]
-        (post-text-area "post[text]")
+        (forum.views.posts/post-text-area "post[text]")
         (anti-forgery-field)
         (submit-button {:class "btn btn-primary"} "Submit"))
       ))

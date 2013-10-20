@@ -1,7 +1,8 @@
 (ns forum.controllers.sessions
-  (:require [forum.controllers.base :refer [load-base]]
+  (:require [forum.controllers.base :refer :all]
             [forum.authentication :refer [match?]]))
-(load-base)
+
+(load-base-controller)
 
 (defn create [uname pwd]
   (let [user (db/find-user-by-uname uname)]

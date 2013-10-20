@@ -1,15 +1,7 @@
 (ns forum.views.forums
-  (:require [ring.util.anti-forgery :refer [anti-forgery-field]]
-            [forum.views.posts :refer [post-text-area]]
-            [forum.cancan :refer [can? guest?]]
-            [forum.helpers :refer [creator
-                                   latest-post
-                                   pretty-date
-                                   url-for]]
-            [forum.middleware.wrap-current-user :refer [*current-user*]]
-            [hiccup.core :refer [html]]
-            [hiccup.element :refer [link-to]]
-            [hiccup.form :refer [form-to submit-button text-field]]))
+  (:require [forum.views.base :refer [load-base-view]]))
+
+(load-base-view)
 
 (defn index [forums]
   (html
@@ -52,7 +44,7 @@
                 latest-creator (creator latest-post)]]
       [:div.list-group-item.clearfix.topic
        ;; Topic info
-       [:div.col-sm-9
+       [:div.col-sm-8
         [:div.topic-title
          (link-to (url-for topic) (:topic/title topic))]
 
@@ -65,16 +57,24 @@
          " by " (link-to (url-for user) (:user/uname user))
          ]]
 
+       [:style
+        ".latest-post-meta { color: #888; }
+         .latest-post-meta .latest-post-creator,
+         .latest-post-meta .latest-post {
+           color: #555;
+         }"]
+
        ;; Latest post
-       [:div.col-sm-3
+       [:div.col-sm-4.latest-post-meta
         [:div
-         (link-to (url-for topic
+         (link-to {:class "latest-post"} (url-for topic
                            "#post-"
                            (:post/uid latest-post))
                   "Latest post")
          " by "
-         (link-to (url-for latest-creator)
-                  (:user/uname latest-creator))]
+         (link-to {:class "latest-post-creator"}
+                  (url-for latest-creator)
+                  (decorated-uname latest-creator))]
         (pretty-date (:post/created latest-post))]])]
 
    (when (can? *current-user* :create :topic)
@@ -87,6 +87,6 @@
                       :placeholder "Title"}
                      "topic[title]")]
         [:div.form-group
-         (post-text-area "topic[text]")]
+         (forum.views.posts/post-text-area "topic[text]")]
         (anti-forgery-field)
         (submit-button {:class "btn btn-primary"} "Submit"))))))
