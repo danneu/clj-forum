@@ -25,7 +25,7 @@ resource that can be opened by io/reader."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def uri "datomic:free://localhost:4334/forum")
+(def uri "datomic:free://localhost:4334/clj-forum")
 
 (defn create-db []
   (d/delete-database uri)
@@ -39,7 +39,11 @@ resource that can be opened by io/reader."
   (with-redefs [uri "datomic:mem://forum-test"]
     (create-db)))
 
-(def conn (d/connect uri))
+(defn get-conn []
+  (d/connect uri))
+
+(defn get-db []
+  (d/db (get-conn)))
 
 (defn tempid []
   (d/tempid :db.part/user))
@@ -94,33 +98,33 @@ resource that can be opened by io/reader."
 ;; - find-X-by-Y [y]
 
 (defn find-all-forums []
-  (flatten (find-all-by (d/db conn) :forum/uid)))
+  (flatten (find-all-by (get-db) :forum/uid)))
 
 (defn find-all-users []
-  (map wrap-user (flatten (find-all-by (d/db conn) :user/uid))))
+  (map wrap-user (flatten (find-all-by (get-db) :user/uid))))
 
 (defn find-all-topics []
-  (flatten (find-all-by (d/db conn) :topic/uid)))
+  (flatten (find-all-by (get-db) :topic/uid)))
 
 (defn find-all-posts []
-  (flatten (find-all-by (d/db conn) :post/uid)))
+  (flatten (find-all-by (get-db) :post/uid)))
 
 (defn find-forum-by-uid [uid]
-  (find-by (d/db conn) :forum/uid (Long. uid)))
+  (find-by (get-db) :forum/uid (Long. uid)))
 
 (defn find-user-by-uid [uid]
-  (when-let [entity (find-by (d/db conn) :user/uid (Long. uid))]
+  (when-let [entity (find-by (get-db) :user/uid (Long. uid))]
     (wrap-user entity)))
 
 (defn find-user-by-uname [uname]
-  (when-let [entity (find-by (d/db conn) :user/uname uname)]
+  (when-let [entity (find-by (get-db) :user/uname uname)]
     (wrap-user entity)))
 
 (defn find-topic-by-uid [uid]
-  (find-by (d/db conn) :topic/uid (Long. uid)))
+  (find-by (get-db) :topic/uid (Long. uid)))
 
 (defn find-post-by-uid [uid]
-  (find-by (d/db conn) :post/uid (Long. uid)))
+  (find-by (get-db) :post/uid (Long. uid)))
 
 ;; Retraction ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -132,7 +136,7 @@ resource that can be opened by io/reader."
   (when-let [post (find-post-by-uid uid)]
     (assert (not (first-post? post)))
     (let [result @(d/transact
-                   conn
+                   (get-conn)
                    [[:db.fn/retractEntity (:db/id post)]])]
       result)))
 
@@ -173,7 +177,7 @@ resource that can be opened by io/reader."
                           (when role
                             {:user/role role}))]
       (let [result @(d/transact
-                     conn
+                     (get-conn)
                      [user-map
                       [:addUID eid :user/uid]])]
         (:user/uid (created-entity result :user/uname uname))))))
@@ -183,13 +187,13 @@ resource that can be opened by io/reader."
   [title desc]
   (let [eid (tempid)
         result @(d/transact
-                 conn [[:forum/construct eid title desc]])]
+                 (get-conn) [[:forum/construct eid title desc]])]
     (:forum/uid (created-entity result :forum/title title))))
 
 (defn create-topic
   "Returns uid or nil"
   [user-uid fuid title text]
-  (let [result @(d/transact conn
+  (let [result @(d/transact (get-conn)
                             [[:topic/construct
                               (Long. user-uid)
                               (Long. fuid)
@@ -201,7 +205,7 @@ resource that can be opened by io/reader."
   "Return uid or nil"
   [user-uid tuid text]
   (let [result @(d/transact
-                 conn
+                 (get-conn)
                  [[:post/construct
                    (Long. user-uid)
                    (Long. tuid)
@@ -211,7 +215,7 @@ resource that can be opened by io/reader."
 (defn update-post
   "Return uid or nil."
   [puid text]
-  (let [result @(d/transact conn [[:post/update
+  (let [result @(d/transact (get-conn) [[:post/update
                                    (Long. puid)
                                    text]])]
     ;; TODO: Change name of created-entity fn...
@@ -231,7 +235,7 @@ resource that can be opened by io/reader."
                                             [:user/uname
                                              :user/email
                                              :user/digest]))]
-    (let [result @(d/transact conn [modified-entity])]
+    (let [result @(d/transact (get-conn) [modified-entity])]
       (when result
         (Long. uid)))))
 
@@ -258,8 +262,6 @@ resource that can be opened by io/reader."
   (str/join  " " (repeatedly 3 generate-sentence)))
 
 (defn seed2 []
-  (d/release conn)
-  (def conn (create-db))
   (let [user-uids (let [r [;; Admin
                            (create-user {:uname "danneu" :email "me@example.com" :pwd "secret" :role :admin})
                            ;; Moderator
@@ -306,5 +308,5 @@ resource that can be opened by io/reader."
                       :in $ ?f
                       :where [?f :forum/topics ?t]
                       [?t :topic/posts ?p]]
-                    (d/db conn) feid)]
+                    (get-db) feid)]
     (only result)))
