@@ -112,9 +112,15 @@ resource that can be opened by io/reader."
 (defn find-forum-by-uid [uid]
   (find-by (get-db) :forum/uid (Long. uid)))
 
-(defn find-user-by-uid [uid]
-  (when-let [entity (find-by (get-db) :user/uid (Long. uid))]
-    (wrap-user entity)))
+(defn find-user-by-uid
+  ([uid] (find-user-by-uid (get-db) uid))
+  ([db uid]
+     (when-let [entity (->> (d/datoms db :avet :user/uid uid)
+                            (d/q '[:find ?e :where [?e]])
+                            ffirst
+                            (d/entity db)
+                            )]
+       (wrap-user entity))))
 
 (defn find-user-by-uname [uname]
   (when-let [entity (find-by (get-db) :user/uname uname)]
