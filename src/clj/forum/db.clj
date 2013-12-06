@@ -97,6 +97,7 @@ resource that can be opened by io/reader."
 ;; - find-all-X []
 ;; - find-X-by-Y [y]
 
+;; TODO: Redo these using datom index.
 (defn find-all-forums []
   (flatten (find-all-by (get-db) :forum/uid)))
 
@@ -109,28 +110,55 @@ resource that can be opened by io/reader."
 (defn find-all-posts []
   (flatten (find-all-by (get-db) :post/uid)))
 
-(defn find-forum-by-uid [uid]
-  (find-by (get-db) :forum/uid (Long. uid)))
+;; TODO: Replace find-by
+(defn find-one-by-attr
+  ([db attr & [val]]
+     (->> (if val
+            (d/datoms db :avet attr val)
+            (d/datoms db :avet attr))
+          (d/q '[:find ?e :where [?e]])
+          ffirst
+          (d/entity db))))
+
+(defn find-all-by-attr
+  ([db attr & [val]]
+     (->> (if val
+            (d/datoms db :avet attr val)
+            (d/datoms db :avet attr))
+          (d/q '[:find ?e :where [?e]])
+          (map (comp (partial d/entity db) first)))))
+
+(defn find-all-users
+  ([] (find-all-users (get-db)))
+  ([db]
+     (map wrap-user (find-all-by-attr db :user/uid))))
+
+(defn find-forum-by-uid
+  ([uid] (find-forum-by-uid (get-db) uid))
+  ([db uid]
+     (find-one-by-attr db :forum/uid (Long. uid))))
 
 (defn find-user-by-uid
   ([uid] (find-user-by-uid (get-db) uid))
   ([db uid]
-     (when-let [entity (->> (d/datoms db :avet :user/uid uid)
-                            (d/q '[:find ?e :where [?e]])
-                            ffirst
-                            (d/entity db)
-                            )]
+     (when-let [entity (find-one-by-attr db :user/uid (Long. uid))]
        (wrap-user entity))))
 
-(defn find-user-by-uname [uname]
-  (when-let [entity (find-by (get-db) :user/uname uname)]
-    (wrap-user entity)))
+(defn find-user-by-uname
+  ([uname] (find-user-by-uname (get-db) uname))
+  ([db uname]
+     (when-let [entity (find-one-by-attr db :user/uname uname)]
+       (wrap-user entity))))
 
-(defn find-topic-by-uid [uid]
-  (find-by (get-db) :topic/uid (Long. uid)))
+(defn find-topic-by-uid
+  ([uid] (find-topic-by-uid (get-db) uid))
+  ([db uid]
+     (find-one-by-attr db :topic/uid (Long. uid))))
 
-(defn find-post-by-uid [uid]
-  (find-by (get-db) :post/uid (Long. uid)))
+(defn find-post-by-uid
+  ([uid] (find-post-by-uid (get-db) uid))
+  ([db uid]
+     (find-one-by-attr db :post/uid (Long. uid))))
 
 ;; Retraction ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

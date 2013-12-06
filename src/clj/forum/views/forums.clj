@@ -31,7 +31,6 @@
 (defn show [forum topics]
   (html
 
-
    [:style ".topics .topic { padding: 5px 0; }"]
    [:style ".topics .topic.sticky { background-color: #f5f5f5; }"]
 
@@ -39,7 +38,7 @@
 
    [:div.list-group.topics
     (for [topic topics
-          :let [[user] (:user/_topics topic)
+          :let [user (first (:user/_topics topic))
                 latest-post (latest-post topic)
                 latest-creator (creator latest-post)]]
       [:div.list-group-item.clearfix.topic
@@ -67,7 +66,8 @@
        ;; Latest post
        [:div.col-sm-4.latest-post-meta
         [:div
-         (link-to {:class "latest-post"} (url-for topic
+         (link-to {:class "latest-post"}
+                  (url-for topic
                            "#post-"
                            (:post/uid latest-post))
                   "Latest post")

@@ -9,7 +9,7 @@
    [:h1 (:topic/title topic)]
 
    (for [post posts
-         :let [[user] (:user/_posts post)]]
+         :let [user (first (:user/_posts post))]]
      [:div.panel.panel-default.post
       [:a {:name (str "post-" (:post/uid post))}]
       ;; Post heading
