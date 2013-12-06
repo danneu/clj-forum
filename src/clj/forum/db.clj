@@ -90,6 +90,30 @@ resource that can be opened by io/reader."
   (->> (apply d/q query db args)
        (mapv first)))
 
+;; Entity counts ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn get-forum-count
+  ([] (get-forum-count (get-db)))
+  ([db]
+     (count (seq (d/datoms db :avet :forum/uid)))))
+
+(defn get-post-count
+  ([] (get-post-count (get-db)))
+  ([db]
+     (count (seq (d/datoms db :avet :post/uid)))))
+
+(defn get-user-count
+  ([] (get-user-count (get-db)))
+  ([db]
+     (count (seq (d/datoms db :avet :user/uid)))))
+
+(defn get-topic-count
+  ([] (get-topic-count (get-db)))
+  ([db]
+     (count (seq (d/datoms db :avet :topic/uid)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;; Finders - Return one or many entities ;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; Forms:
@@ -176,12 +200,8 @@ resource that can be opened by io/reader."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; TODO: This is roundabout. Can I think of something better?
+;; NOOBFIXME: Implement this with resolve-tempids -_____-
 (defn- created-entity
-  "Returns the entity created from a transaction (or nil)
-   where `tx-result` is the result of a d/transact call.
-   `attr` and `val` are used to look through the created Datoms.
-   Ex: (created-entity res :user/uname \"danneu\")"
   [tx-result attr val]
   (d/entity (:db-after tx-result)
             (:e (first (filter #(= val (:v %))
@@ -340,7 +360,8 @@ resource that can be opened by io/reader."
 (defn forum-posts-count [feid]
   (let [result (d/q '[:find (count ?p)
                       :in $ ?f
-                      :where [?f :forum/topics ?t]
+                      :where
+                      [?f :forum/topics ?t]
                       [?t :topic/posts ?p]]
                     (get-db) feid)]
     (only result)))
