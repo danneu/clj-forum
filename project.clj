@@ -4,7 +4,7 @@
   :dependencies
   [[org.clojure/clojure "1.5.1"]
    [compojure "1.1.5"]  ; Routing
-   [com.datomic/datomic-free "0.8.4020.24"]  ; Database
+   [com.datomic/datomic-free "0.9.4324"]  ; Database
    [org.ocpsoft.prettytime/prettytime "3.1.0.Final"]  ; Date -> "2 days ago"
    [bouncer "0.3.0-alpha1"]  ; Validation
    [hiccup "1.0.4"]  ; Templating
